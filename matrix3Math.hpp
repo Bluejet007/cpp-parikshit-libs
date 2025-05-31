@@ -97,29 +97,35 @@ class Matrix3 {
             copy(begin(obj[i]), end(obj[i]), row.begin());
             mat.push_back(row);
         }
-        
+
         return *this;
     }
 
-    void operator+=(const Matrix3& obj) {
+    Matrix3& operator+=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat.at(i).at(j) += obj.mat.at(i).at(j);
+
+        return *this;
     }
 
-    void operator-=(const Matrix3& obj) {
+    Matrix3& operator-=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat.at(i).at(j) -= obj.mat.at(i).at(j);
+
+        return *this;
     }
 
-    void operator*=(const float scalar) {
+    Matrix3& operator*=(const float scalar) {
        for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat.at(i).at(j) *= scalar;
+
+        return *this;
     }
 
-    void operator*=(const Matrix3& obj) {
+    Matrix3& operator*=(const Matrix3& obj) {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++) {
@@ -129,6 +135,8 @@ class Matrix3 {
 
             copy(begin(res[i]), end(res[i]), mat.at(i).begin());
         }
+
+        return *this;
     }
 
     bool operator==(const Matrix3& obj) const {
@@ -186,7 +194,7 @@ class Matrix3 {
                 for(char row = 0; row < 3; row++)
                     for(char col = 0; col < 3; col++)
                         if(row != i && col != j) {
-                            cof[iCof][jCof++] = mat[row][col];
+                            cof[iCof][jCof++] = mat.at(row).at(col);
                             
                             if(jCof == 2) {
                                 jCof = 0;
