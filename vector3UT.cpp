@@ -20,7 +20,7 @@ void assert(const string name, const float sub, const float aim) {
 
 int main() {
     // Constructors
-    cout << "CONSTRUCTORS" << endl; {
+    cout << endl<< "CONSTRUCTORS" << endl; {
     
         assert("Default", Vector3(), {0, 0, 0});
         assert("Scalar", Vector3(-2), {-2, -2, -2});

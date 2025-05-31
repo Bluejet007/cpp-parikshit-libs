@@ -98,26 +98,32 @@ class Vector3 {
         return *this;
     }
 
-    void operator+=(const Vector3& obj) {
+    Vector3& operator+=(const Vector3& obj) {
         
         vec.at(0) += obj.vec.at(0);
         vec.at(1) += obj.vec.at(1);
         vec.at(2) += obj.vec.at(2);
+
+        return *this;
     }
 
-    void operator-=(const Vector3& obj) {
+    Vector3& operator-=(const Vector3& obj) {
         vec.at(0) -= obj.vec.at(0);
         vec.at(1) -= obj.vec.at(1);
         vec.at(2) -= obj.vec.at(2);
+
+        return *this;
     }
 
-    void operator*=(const Vector3& obj) {
+    Vector3& operator*=(const Vector3& obj) {
         vec.at(0) *= obj.vec.at(0);
         vec.at(1) *= obj.vec.at(1);
         vec.at(2) *= obj.vec.at(2);
+
+        return *this;
     }
 
-    void operator/=(const Vector3& obj) {
+    Vector3& operator/=(const Vector3& obj) {
         if(obj.vec.at(0) != 0)
             vec.at(0) /= obj.vec.at(0);
         else
@@ -132,6 +138,8 @@ class Vector3 {
             vec.at(2) /= obj.vec.at(2);
         else
             vec.at(2) = 0;
+
+        return *this;
     }
 
     bool operator==(const Vector3& obj) const {
