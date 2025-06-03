@@ -148,8 +148,8 @@ class Vector3 {
         );
     }
 
-    float operator^(const Vector3& obj) const {
-        return vec.at(0) * obj.vec.at(0) + vec.at(1) * obj.vec.at(1) + vec.at(2) * obj.vec.at(2);
+    inline float operator^(const Vector3& obj) const {
+        return dot(obj);
     }
 
 

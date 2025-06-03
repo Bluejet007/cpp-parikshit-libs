@@ -161,6 +161,10 @@ class Matrix3 {
         );
     }
 
+    inline Matrix3 operator~() {
+        return inverse();
+    }
+
     // Special functions
     // These are unique to the class
     Matrix3 trans() const {
@@ -227,13 +231,17 @@ class Matrix3 {
         Matrix3 invMat = adjoint();
         float determinant = det();
 
-        for(char i = 0; i < 3; i++) {
-            invMat.mat[i][0] /= determinant;
-            invMat.mat[i][1] /= determinant;
-            invMat.mat[i][2] /= determinant;
-        }
+        if (determinant != 0.0f) {
+            for(char i = 0; i < 3; i++) {
+                invMat.mat[i][0] /= determinant;
+                invMat.mat[i][1] /= determinant;
+                invMat.mat[i][2] /= determinant;
+            }
 
-        return invMat;
+            return invMat;
+        }
+        else
+            return nullptr;
     }
 
     // Getters & setters
@@ -256,18 +264,6 @@ class Matrix3 {
         return os;
     }
 };
-
-
-// Additional overload to reflect comuutative property of scalar multiplication
-Matrix3 operator*(const float scalar, const Matrix3 obj) {
-    float res[3][3] = {};
-
-    for(char i = 0; i < 3; i++)
-        for(char j = 0; j < 3; j++)
-            res[i][j] = obj(i, j) * scalar;
-
-    return Matrix3(res);
-}
 
 
 // Additional overload to reflect comuutative property of scalar multiplication
