@@ -92,12 +92,6 @@ class Vector3 {
         return *this;
     }
 
-    Vector3& operator=(const float obj[3]) {
-        vec.assign(obj, obj + 3);
-        
-        return *this;
-    }
-
     Vector3& operator+=(const Vector3& obj) {
         
         vec.at(0) += obj.vec.at(0);
