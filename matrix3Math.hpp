@@ -85,6 +85,10 @@ class Matrix3 {
         return Matrix3(res);
     }
 
+    inline Matrix3 operator/(const float scalar) const{
+        return operator*(1.0f / scalar);
+    }
+
     Matrix3& operator=(const Matrix3& obj) {
         mat = obj.mat;
 
@@ -135,6 +139,12 @@ class Matrix3 {
 
             copy(begin(res[i]), end(res[i]), mat.at(i).begin());
         }
+
+        return *this;
+    }
+
+    inline Matrix3& operator/=(const float scalar) {
+        operator*=( 1.0f / scalar);
 
         return *this;
     }
@@ -242,5 +252,17 @@ class Matrix3 {
         return os;
     }
 };
+
+
+// Additional overload to reflect comuutative property of scalar multiplication
+Matrix3 operator*(const float scalar, const Matrix3 obj) {
+    float res[3][3] = {};
+
+    for(char i = 0; i < 3; i++)
+        for(char j = 0; j < 3; j++)
+            res[i][j] = obj(i, j) * scalar;
+
+    return Matrix3(res);
+}
 
 #endif
