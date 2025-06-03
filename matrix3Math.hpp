@@ -269,4 +269,16 @@ Matrix3 operator*(const float scalar, const Matrix3 obj) {
     return Matrix3(res);
 }
 
+
+// Additional overload to reflect comuutative property of scalar multiplication
+Matrix3 operator*(const float scalar, const Matrix3 obj) {
+    float res[3][3] = {};
+
+    for(char i = 0; i < 3; i++)
+        for(char j = 0; j < 3; j++)
+            res[i][j] = obj(i, j) * scalar;
+
+    return Matrix3(res);
+}
+
 #endif
