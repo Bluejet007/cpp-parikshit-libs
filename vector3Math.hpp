@@ -13,9 +13,9 @@ class Vector3 {
     
     public:
     // Default constructor
-    Vector3(): vec(3, 0) {}
+    Vector3(): vec(3, 0.0f) {}
     // Construct with individual values
-    Vector3(const float x, const float y, const float z = 0) {
+    Vector3(const float x, const float y, const float z = 0.0f) {
         vec.push_back(x);
         vec.push_back(y);
         vec.push_back(z);
