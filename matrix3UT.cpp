@@ -114,20 +114,55 @@ int main() {
         assert("Multiplication 2", res, mul43);
         res = -2.0f * temp2;
         assert("Scalar multiplication 1", res, mul6);
-        res = temp2 * -2.0f;
-        assert("Scalar multiplication 2", res, mul6);
         res = res / -2.0f;
         assert("Scalar division", res, test4);
+        res = temp2 * -2.0f;
+        assert("Scalar multiplication 2", res, mul6);
+        res = res * 0.0f;
+        assert("Scalar multiplication 3", res, test1);
     }
 
     // Trace & Determinant
     cout << endl << "TRACE & DETERMINANT" << endl; {
+        Matrix3 temp;
 
+        temp = Matrix3(test1);
+        assert("Trace 1", temp.trace(), 0.0f);
+        assert("Determinant 1", temp.det(), 0.0f);
+        temp = Matrix3(test2);
+        assert("Trace 2", temp.trace(), -6.0f);
+        assert("Determinant 2", temp.det(), -8.0f);
+        temp = Matrix3(test3);
+        assert("Trace 3", temp.trace(), 16.0f);
+        assert("Determinant 3", temp.det(), 120.0f);
+        temp = Matrix3(test4);
+        assert("Trace 4", temp.trace(), 15.0f);
+        assert("Determinant 4", temp.det(), 158.0f);
     }
 
     // Transpose, Adjoint & Inverse
     cout << endl << "TRANSPOSE, ADJOINT & INVERSE" << endl; {
+        Matrix3 temp;
 
+        float adj2[3][3] = {
+            {4.0f, 0.0f, 0.0f},
+            {0.0f, 4.0f, 0.0f},
+            {0.0f, 0.0f, 4.0f}
+        };
+
+        float inv1[3][3] = {
+            {-0.5f, 0.0f, 0.0f},
+            {0.0f, -0.5f, 0.0f},
+            {0.0f, 0.0f, -0.5f}
+        };
+
+        temp = Matrix3(test1);
+        assert("Transpose 1", temp.trans(), test1);
+        assert("Adjoint 1", temp.adjoint(), test1);
+        temp = Matrix3(test2);
+        assert("Transpose 2", temp.trans(), test2);
+        assert("Adjoint 2", temp.adjoint(), adj2);
+        assert("Inverse 1", temp.inverse(), inv1);
     }
 
     return 0;
