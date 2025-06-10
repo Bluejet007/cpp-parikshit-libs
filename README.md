@@ -1,1 +1,2 @@
-
+# Matlab-C++ Library
+The library contains classes equivalent to common data structures used in **Matlab** by *ADCS*. The classes are intended to be used in most *Matlab-C++* code conversion tasks, simplifying the process & improving code readability. All classes overload common arthmetic operators. 3 classes are currently provided - **Matrix<sub>3x3</sub>** & **Vector** (of length **3** & **4**).
