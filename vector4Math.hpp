@@ -26,6 +26,11 @@ class Vector4 {
     // Scalar vector
     Vector4(const float scalar): vec(4, scalar) {}
 
+    // Deconstruct vector into normal array
+    void toArray(float arr[4]) {
+        copy(vec.begin(), vec.end(), arr);
+    }
+
     // Operator overloading
     // Loops aren't used to avoid the overhead of looping statements
     // (iteration variable, incrementation, condition checking)
@@ -79,7 +84,7 @@ class Vector4 {
     }
 
     Vector4 operator/(const Vector4& obj) const {
-        float res[4] = {};
+        float res[4] = {INFINITY, INFINITY, INFINITY, INFINITY};
         
         if(obj.vec[0] != 0)
             res[0] = vec[0] / obj.vec[0];
@@ -131,22 +136,22 @@ class Vector4 {
         if(obj.vec[0] != 0)
             vec[0] /= obj.vec[0];
         else
-            vec[0] = 0;
+            vec[0] = INFINITY;
 
         if(obj.vec[1] != 0)
             vec[1] /= obj.vec[1];
         else
-            vec[1] = 0;
+            vec[1] = INFINITY;
 
         if(obj.vec[2] != 0)
             vec[2] /= obj.vec[2];
         else
-            vec[2] = 0;
+            vec[2] = INFINITY;
 
         if(obj.vec[3] != 0)
             vec[3] /= obj.vec[3];
         else
-            vec[3] = 0;
+            vec[3] = INFINITY;
 
         return *this;
     }

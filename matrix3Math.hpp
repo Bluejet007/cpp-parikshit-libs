@@ -26,7 +26,13 @@ class Matrix3 {
         for(char i = 0; i < 3; i++) {
             mat.push_back(vector<float>(3, 0));
             mat.at(i).at(i) = scalar;
-        }    
+        }
+    }
+
+    // Deconstruct matrix into normal arrays
+    void toArray(float res[3][3]) {
+        for(char i = 0; i < 3; i++)
+            copy(mat[i].begin(), mat[i].end(), begin(res[i]));
     }
 
     // Operator overloading
