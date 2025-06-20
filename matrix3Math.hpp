@@ -25,7 +25,7 @@ class Matrix3 {
     Matrix3(float scalar) {
         for(char i = 0; i < 3; i++) {
             mat.push_back(vector<float>(3, 0));
-            mat.at(i).at(i) = scalar;
+            mat[i][i] = scalar;
         }
     }
 
@@ -41,7 +41,7 @@ class Matrix3 {
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                res[i][j] = mat.at(i).at(j) + obj.mat.at(i).at(j);
+                res[i][j] = mat[i][j] + obj.mat[i][j];
 
         return Matrix3(res);
     }
@@ -56,7 +56,7 @@ class Matrix3 {
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                res[i][j] = mat.at(i).at(j) - obj.mat.at(i).at(j);
+                res[i][j] = mat[i][j] - obj.mat[i][j];
 
         return Matrix3(res);
     }
@@ -66,7 +66,7 @@ class Matrix3 {
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                res[i][j] = -mat.at(i).at(j);
+                res[i][j] = -mat[i][j];
 
         return Matrix3(res);
     }
@@ -76,7 +76,7 @@ class Matrix3 {
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                res[i][j] = mat.at(i).at(j) * scalar;
+                res[i][j] = mat[i][j] * scalar;
 
         return Matrix3(res);
     }
@@ -87,7 +87,7 @@ class Matrix3 {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 for(char k = 0; k < 3; k++)
-                    res[i][j] += mat.at(i).at(k) * obj.mat.at(k).at(j);
+                    res[i][j] += mat[i][k] * obj.mat[k][j];
 
         return Matrix3(res);
     }
@@ -123,7 +123,7 @@ class Matrix3 {
     Matrix3& operator+=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                mat.at(i).at(j) += obj.mat.at(i).at(j);
+                mat[i][j] += obj.mat[i][j];
 
         return *this;
     }
@@ -131,7 +131,7 @@ class Matrix3 {
     Matrix3& operator-=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                mat.at(i).at(j) -= obj.mat.at(i).at(j);
+                mat[i][j] -= obj.mat[i][j];
 
         return *this;
     }
@@ -139,7 +139,7 @@ class Matrix3 {
     Matrix3& operator*=(const float scalar) {
        for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                mat.at(i).at(j) *= scalar;
+                mat[i][j] *= scalar;
 
         return *this;
     }
@@ -150,9 +150,9 @@ class Matrix3 {
         for(char i = 0; i < 3; i++) {
             for(char j = 0; j < 3; j++)
                 for(char k = 0; k < 3; k++)
-                    res[i][j] += mat.at(i).at(k) * obj.mat.at(k).at(j);
+                    res[i][j] += mat[i][k] * obj.mat[k][j];
 
-            copy(begin(res[i]), end(res[i]), mat.at(i).begin());
+            copy(begin(res[i]), end(res[i]), mat[i].begin());
         }
 
         return *this;
@@ -170,9 +170,9 @@ class Matrix3 {
 
     bool operator==(const Matrix3& obj) const {
         return (
-            mat.at(0) == obj.mat.at(0) &&
-            mat.at(1) == obj.mat.at(1) &&
-            mat.at(2) == obj.mat.at(2)
+            mat[0] == obj.mat[0] &&
+            mat[1] == obj.mat[1] &&
+            mat[2] == obj.mat[2]
         );
     }
 
@@ -192,7 +192,7 @@ class Matrix3 {
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
-                res[i][j] = mat.at(j).at(i);
+                res[i][j] = mat[j][i];
 
         return Matrix3(res);
     }
@@ -201,7 +201,7 @@ class Matrix3 {
         float trace = 0.0f;
 
         for(char i = 0; i < 3; i++)
-            trace += mat.at(i).at(i);
+            trace += mat[i][i];
 
         return trace;
     }
@@ -211,11 +211,11 @@ class Matrix3 {
 
         // Positive multiplication terms
         for(char i = 0; i < 3; i++)
-            det += mat.at(i % 3).at(0) * mat.at((i + 1) % 3).at(1) * mat.at((i + 2) % 3).at(2);
+            det += mat[i % 3][0] * mat[(i + 1) % 3][1] * mat[(i + 2) % 3][2];
 
         // Negative multiplication terms
         for(char i = 0; i < 3; i++)
-            det -= mat.at(i % 3).at(2) * mat.at((i + 1) % 3).at(1) * mat.at((i + 2) % 3).at(0);
+            det -= mat[i % 3][2] * mat[(i + 1) % 3][1] * mat[(i + 2) % 3][0];
 
         return det;
     }
@@ -232,7 +232,7 @@ class Matrix3 {
                 for(char row = 0; row < 3; row++)
                     for(char col = 0; col < 3; col++)
                         if(row != i && col != j) {
-                            cof[iCof][jCof++] = mat.at(row).at(col);
+                            cof[iCof][jCof++] = mat[row][col];
                             
                             if(jCof == 2) {
                                 jCof = 0;
@@ -268,11 +268,11 @@ class Matrix3 {
 
     // Getters & setters
     float& operator()(int i, int j) {
-        return mat.at(i % 3).at(j % 3);
+        return mat[i % 3][j % 3];
     }
 
     float operator()(int i, int j) const {
-        return mat.at(i % 3).at(j % 3);
+        return mat[i % 3][j % 3];
     }
 
     // toString()
