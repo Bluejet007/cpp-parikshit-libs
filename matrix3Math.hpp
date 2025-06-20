@@ -40,6 +40,7 @@ class Matrix3 {
         return Matrix3(res);
     }
 
+    // Unary plus forces pass-by-ref to be pass-by-value
     Matrix3 operator+() const {
         return Matrix3(*this);
     }
@@ -85,11 +86,16 @@ class Matrix3 {
         return Matrix3(res);
     }
 
+    // Operator overload delibrately doesn't support division by matrix.
+    // Use "A * ~B"
+    // Or "A * B.inverse()"
     inline Matrix3 operator/(const float scalar) const{
+        static Matrix3 nullMat = Matrix3();
+        
         if(scalar != 0.0f)
             return operator*(1.0f / scalar);
         else
-            return nullptr;
+            return nullMat;
     }
 
     Matrix3& operator=(const Matrix3& obj) {
@@ -146,6 +152,9 @@ class Matrix3 {
         return *this;
     }
 
+    // Operator overload delibrately doesn't support division by matrix.
+    // Use "A *= ~B"
+    // Or "A *= B.inverse()"
     inline Matrix3& operator/=(const float scalar) {
         if(scalar != 0.0f)
             operator*=( 1.0f / scalar);
@@ -161,6 +170,11 @@ class Matrix3 {
         );
     }
 
+    inline bool operator!=(const Matrix3& obj) const {
+        return !operator==(obj);
+    }
+
+    // Inverse operator shorthand
     inline Matrix3 operator~() {
         return inverse();
     }
@@ -228,6 +242,8 @@ class Matrix3 {
     }
 
     Matrix3 inverse() const {
+        static Matrix3 nullMat = Matrix3();
+
         Matrix3 invMat = adjoint();
         float determinant = det();
 
@@ -241,7 +257,7 @@ class Matrix3 {
             return invMat;
         }
         else
-            return nullptr;
+            return nullMat;
     }
 
     // Getters & setters
@@ -254,6 +270,9 @@ class Matrix3 {
     }
 
     // toString()
+    // "a b c\n"
+    // "x y z\n"
+    // "p q r\n"
     friend ostream& operator<< (ostream& os, const Matrix3& obj) {
         for(const vector<float>& row: obj.mat) {
             for(const float ele: row)
@@ -265,16 +284,9 @@ class Matrix3 {
     }
 };
 
-
-// Additional overload to reflect comuutative property of scalar multiplication
-Matrix3 operator*(const float scalar, const Matrix3 obj) {
-    float res[3][3] = {};
-
-    for(char i = 0; i < 3; i++)
-        for(char j = 0; j < 3; j++)
-            res[i][j] = obj(i, j) * scalar;
-
-    return Matrix3(res);
+// Additional overload to reflect commutative property of scalar multiplication
+inline Matrix3 operator*(const float scalar, const Matrix3 obj) {
+    return obj * scalar;
 }
 
 #endif
