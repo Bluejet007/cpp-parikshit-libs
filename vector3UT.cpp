@@ -37,9 +37,9 @@ int main() {
 
         assert("Plus", +testA, {0, 21, -5});
         assert("Minus", -testA, {0, -21, 5});
-        assert("Subscript 1", {testA(0), testA(1), testA(2)}, {0, 21, -5});
-        testA(2) = testB(1);
-        assert("Subscript 2", {testA(0), testA(1), testA(2)}, {0, 21, 2});
+        assert("Subscript 1", {testA[0], testA[1], testA[2]}, {0, 21, -5});
+        testA[2] = testB[1];
+        assert("Subscript 2", {testA[0], testA[1], testA[2]}, {0, 21, 2});
     }
 
     // Assignment Operators

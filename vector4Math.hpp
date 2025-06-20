@@ -33,10 +33,10 @@ class Vector4 {
     Vector4 operator+(const Vector4& obj) const {
         float res[4] = {};
         
-        res[0] = vec.at(0) + obj.vec.at(0);
-        res[1] = vec.at(1) + obj.vec.at(1);
-        res[2] = vec.at(2) + obj.vec.at(2);
-        res[3] = vec.at(3) + obj.vec.at(3);
+        res[0] = vec[0] + obj.vec[0];
+        res[1] = vec[1] + obj.vec[1];
+        res[2] = vec[2] + obj.vec[2];
+        res[3] = vec[3] + obj.vec[3];
 
         return Vector4(res);
     }
@@ -48,10 +48,10 @@ class Vector4 {
     Vector4 operator-(const Vector4& obj) const {
         float res[4] = {};
         
-        res[0] = vec.at(0) - obj.vec.at(0);
-        res[1] = vec.at(1) - obj.vec.at(1);
-        res[2] = vec.at(2) - obj.vec.at(2);
-        res[3] = vec.at(3) - obj.vec.at(3);
+        res[0] = vec[0] - obj.vec[0];
+        res[1] = vec[1] - obj.vec[1];
+        res[2] = vec[2] - obj.vec[2];
+        res[3] = vec[3] - obj.vec[3];
 
         return Vector4(res);
     }
@@ -59,10 +59,10 @@ class Vector4 {
     Vector4 operator-() const {
         float res[4] = {};
 
-        res[0] = -vec.at(0);
-        res[1] = -vec.at(1);
-        res[2] = -vec.at(2);
-        res[3] = -vec.at(3);
+        res[0] = -vec[0];
+        res[1] = -vec[1];
+        res[2] = -vec[2];
+        res[3] = -vec[3];
 
         return Vector4(res);
     }
@@ -70,10 +70,10 @@ class Vector4 {
     Vector4 operator*(const Vector4& obj) const {
         float res[4] = {};
         
-        res[0] = vec.at(0) * obj.vec.at(0);
-        res[1] = vec.at(1) * obj.vec.at(1);
-        res[2] = vec.at(2) * obj.vec.at(2);
-        res[3] = vec.at(3) * obj.vec.at(3);
+        res[0] = vec[0] * obj.vec[0];
+        res[1] = vec[1] * obj.vec[1];
+        res[2] = vec[2] * obj.vec[2];
+        res[3] = vec[3] * obj.vec[3];
 
         return Vector4(res);
     }
@@ -81,14 +81,14 @@ class Vector4 {
     Vector4 operator/(const Vector4& obj) const {
         float res[4] = {};
         
-        if(obj.vec.at(0) != 0)
-            res[0] = vec.at(0) / obj.vec.at(0);
-        if(obj.vec.at(1) != 0)
-            res[1] = vec.at(1) / obj.vec.at(1);
-        if(obj.vec.at(2) != 0)
-            res[2] = vec.at(2) / obj.vec.at(2);
-        if(obj.vec.at(3) != 0)
-            res[3] = vec.at(3) / obj.vec.at(3);
+        if(obj.vec[0] != 0)
+            res[0] = vec[0] / obj.vec[0];
+        if(obj.vec[1] != 0)
+            res[1] = vec[1] / obj.vec[1];
+        if(obj.vec[2] != 0)
+            res[2] = vec[2] / obj.vec[2];
+        if(obj.vec[3] != 0)
+            res[3] = vec[3] / obj.vec[3];
 
         return Vector4(res);
     }
@@ -101,69 +101,78 @@ class Vector4 {
 
     Vector4 operator+=(const Vector4& obj) {
         
-        vec.at(0) += obj.vec.at(0);
-        vec.at(1) += obj.vec.at(1);
-        vec.at(2) += obj.vec.at(2);
-        vec.at(3) += obj.vec.at(3);
+        vec[0] += obj.vec[0];
+        vec[1] += obj.vec[1];
+        vec[2] += obj.vec[2];
+        vec[3] += obj.vec[3];
 
         return *this;
     }
 
     Vector4 operator-=(const Vector4& obj) {
-        vec.at(0) -= obj.vec.at(0);
-        vec.at(1) -= obj.vec.at(1);
-        vec.at(2) -= obj.vec.at(2);
-        vec.at(3) -= obj.vec.at(3);
+        vec[0] -= obj.vec[0];
+        vec[1] -= obj.vec[1];
+        vec[2] -= obj.vec[2];
+        vec[3] -= obj.vec[3];
 
         return *this;
     }
 
     Vector4 operator*=(const Vector4& obj) {
-        vec.at(0) *= obj.vec.at(0);
-        vec.at(1) *= obj.vec.at(1);
-        vec.at(2) *= obj.vec.at(2);
-        vec.at(3) *= obj.vec.at(3);
+        vec[0] *= obj.vec[0];
+        vec[1] *= obj.vec[1];
+        vec[2] *= obj.vec[2];
+        vec[3] *= obj.vec[3];
 
         return *this;
     }
 
     Vector4 operator/=(const Vector4& obj) {
-        if(obj.vec.at(0) != 0)
-            vec.at(0) /= obj.vec.at(0);
+        if(obj.vec[0] != 0)
+            vec[0] /= obj.vec[0];
         else
-            vec.at(0) = 0;
+            vec[0] = 0;
 
-        if(obj.vec.at(1) != 0)
-            vec.at(1) /= obj.vec.at(1);
+        if(obj.vec[1] != 0)
+            vec[1] /= obj.vec[1];
         else
-            vec.at(1) = 0;
+            vec[1] = 0;
 
-        if(obj.vec.at(2) != 0)
-            vec.at(2) /= obj.vec.at(2);
+        if(obj.vec[2] != 0)
+            vec[2] /= obj.vec[2];
         else
-            vec.at(2) = 0;
+            vec[2] = 0;
 
-        if(obj.vec.at(3) != 0)
-            vec.at(3) /= obj.vec.at(3);
+        if(obj.vec[3] != 0)
+            vec[3] /= obj.vec[3];
         else
-            vec.at(3) = 0;
+            vec[3] = 0;
 
         return *this;
     }
-
+    
     bool operator==(const Vector4& obj) const {
         return vec == obj.vec;
     }
-
+    
     bool operator==(const float obj[4]) const {
         return (
-            vec.at(0) == obj[0] &&
-            vec.at(1) == obj[1] &&
-            vec.at(2) == obj[2] &&
-            vec.at(3) == obj[3]
+            vec[0] == obj[0] &&
+            vec[1] == obj[1] &&
+            vec[2] == obj[2] &&
+            vec[3] == obj[3]
         );
     }
+    
+    bool operator!=(const Vector4& obj) const {
+        return !operator==(obj);
+    }
+    
+    bool operator!=(const float obj[4]) const {
+        return !operator==(obj);
+    }
 
+    // Dot product shorthand
     inline float operator^(const Vector4& obj) const {
         return dot(obj);
     }
@@ -171,15 +180,15 @@ class Vector4 {
 
     // Special functions
     // These are unique to this class
-    Vector4 normal() {
+    Vector4 normal() const {
         float res[4] = {};
         float magnitude = getMagnitude();
 
         if(magnitude != 0.0f) {
-            res[0] = vec.at(0) / magnitude;
-            res[1] = vec.at(1) / magnitude;
-            res[2] = vec.at(2) / magnitude;
-            res[3] = vec.at(3) / magnitude;
+            res[0] = vec[0] / magnitude;
+            res[1] = vec[1] / magnitude;
+            res[2] = vec[2] / magnitude;
+            res[3] = vec[3] / magnitude;
         }
 
         return Vector4(res);
@@ -189,19 +198,19 @@ class Vector4 {
         float magnitude = getMagnitude();
 
         if(magnitude != 0.0f) {
-            vec.at(0) /= magnitude;
-            vec.at(1) /= magnitude;
-            vec.at(2) /= magnitude;
-            vec.at(3) /= magnitude;
+            vec[0] /= magnitude;
+            vec[1] /= magnitude;
+            vec[2] /= magnitude;
+            vec[3] /= magnitude;
         }
     }
 
-    inline float dot() const {
-        return vec.at(0) * vec.at(0) + vec.at(1) * vec.at(1) + vec.at(2) * vec.at(2) + vec.at(3) * vec.at(3);
+    inline float dot(const Vector4& obj) const {
+        return vec[0] * obj.vec[0] + vec[1] * obj.vec[1] + vec[2] * obj.vec[2] + vec[3] * obj.vec[3];
     }
 
-    inline float dot(const Vector4& obj) const {
-        return vec.at(0) * obj.vec.at(0) + vec.at(1) * obj.vec.at(1) + vec.at(2) * obj.vec.at(2) + vec.at(3) * obj.vec.at(3);
+    inline float dot() const {
+        return dot(*this);
     }
 
     inline float getMagnitude() const {
@@ -210,16 +219,17 @@ class Vector4 {
 
 
     // Getters & setters
-    float& operator()(int i) {
-        return vec.at(i % 4);
+    float& operator[](int i) {
+        return vec[i % 4];
     }
 
-    float operator()(int i) const {
-        return vec.at(i % 4);
+    float operator[](int i) const {
+        return vec[i % 4];
     }
 
 
     // toString()
+    // "x y z w "
     friend ostream& operator<< (ostream& os, const Vector4& obj) {
         for(const float ele: obj.vec)
             os << ele << ' ';
