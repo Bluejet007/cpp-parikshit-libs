@@ -1,4 +1,6 @@
 *.m
 *.exe
+*.c
+*.h
 
 .vscode/
