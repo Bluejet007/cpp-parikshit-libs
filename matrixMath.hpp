@@ -15,10 +15,10 @@ class Matrix {
 
     public:
     // Default contructor
-    Matrix(const uint16_t m, const uint16_t n): _mat(m, vector<float>(n, 0.0f)) {}
+    Matrix(const uint16_t m, const uint16_t n): _mat(m, vector<float>(n, 0.0f)), _rows(m) , _cols(n) {}
 
     // Construct with values
-    Matrix(const uint16_t m, const uint16_t n, float* matrix): _mat(m, vector<float>(n)) {
+    Matrix(const uint16_t m, const uint16_t n, float* matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
         for(uint16_t i = 0; i < m; i++) {
             float* ptr = matrix + i * n;
 
@@ -26,18 +26,19 @@ class Matrix {
         }
     }
 
-    Matrix(const uint16_t m, const uint16_t n, const float** matrix): _mat(m, vector<float>(n)) {
+    Matrix(const uint16_t m, const uint16_t n, const float** matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
         for(uint16_t i = 0; i < m; i++)
             copy(matrix[i], matrix[i] + n, _mat[i].begin());
     }
 
     // In place constructor
-    Matrix(vector<vector<float>>& matrix) {
-        _mat = matrix;
+    Matrix(vector<vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
+        if(matrix.size() > 0)
+            _cols = matrix[0].size();
     }
 
     // Scalar matrix
-    Matrix(const uint16_t m, const uint16_t n, const float scalar): _mat(m, vector<float>(n, 0.0f)) {
+    Matrix(const uint16_t m, const uint16_t n, const float scalar): _mat(m, vector<float>(n, 0.0f)), _rows(m) , _cols(n) {
         uint16_t lim = min(n, m);
         
         for(uint16_t i = 0; i < lim; i++)
@@ -93,12 +94,12 @@ class Matrix {
         // Unary minus forces pass-by-ref to be pass-by-value
     }
 
-    Matrix operator*(const float scalar) const {
-        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
+    friend Matrix operator*(const Matrix obj, const float scalar) {
+        vector<vector<float>> res = vector<vector<float>>(obj.rows(), vector<float>(obj.cols()));
 
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++)
-                res[i][j] = _mat[i][j] * scalar;
+        for(uint16_t i = 0; i < obj._rows; i++)
+            for(uint16_t j = 0; j < obj._cols; j++)
+                res[i][j] = obj._mat[i][j] * scalar;
 
         return Matrix(res);
     }
@@ -120,14 +121,17 @@ class Matrix {
     // Operator overload delibrately doesn't support division by matrix.
     // Use "A * ~B"
     // Or "A * B.inverse()"
-    inline Matrix operator/(const float scalar) const{
+    inline Matrix operator/(const float scalar) {
         if(scalar != 0.0f)
-            return operator*(1.0f / scalar);
+            return *this * (1.0f / scalar);
         else
             return failMatrix;
     }
 
     Matrix& operator=(const Matrix& obj) {
+        if(this == &obj)
+            return *this;
+
         _mat = obj._mat;
         _rows = obj._rows;
         _cols = obj._cols;

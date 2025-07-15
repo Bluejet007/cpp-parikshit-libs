@@ -6,15 +6,15 @@
 
 using namespace std;
 
-class Matrix {
+class Matrix3 {
     private:
     vector<vector<float>> mat;
 
     public:
     // Default contructor
-    Matrix(): mat(3, vector<float>(3, 0.0f)) {}
+    Matrix3(): mat(3, vector<float>(3, 0.0f)) {}
     // Construct with values
-    Matrix(float matrix[3][3]) {
+    Matrix3(float matrix[3][3]) {
         for(char i = 0; i < 3; i++) {
             vector<float> row(3);
             copy(begin(matrix[i]), end(matrix[i]), row.begin());
@@ -22,7 +22,7 @@ class Matrix {
         }
     }
     // Scalar matrix
-    Matrix(float scalar) {
+    Matrix3(float scalar) {
         for(char i = 0; i < 3; i++) {
             mat.push_back(vector<float>(3, 0));
             mat[i][i] = scalar;
@@ -36,52 +36,52 @@ class Matrix {
     }
 
     // Operator overloading
-    Matrix operator+(const Matrix& obj) const {
+    Matrix3 operator+(const Matrix3& obj) const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 res[i][j] = mat[i][j] + obj.mat[i][j];
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
     // Unary plus forces pass-by-ref to be pass-by-value
-    Matrix operator+() const {
-        return Matrix(*this);
+    Matrix3 operator+() const {
+        return Matrix3(*this);
     }
 
-    Matrix operator-(const Matrix& obj) const {
+    Matrix3 operator-(const Matrix3& obj) const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 res[i][j] = mat[i][j] - obj.mat[i][j];
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
-    Matrix operator-() const {
+    Matrix3 operator-() const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 res[i][j] = -mat[i][j];
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
-    Matrix operator*(const float scalar) const {
+    Matrix3 operator*(const float scalar) const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 res[i][j] = mat[i][j] * scalar;
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
-    Matrix operator*(const Matrix& obj) const {
+    Matrix3 operator*(const Matrix3& obj) const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
@@ -89,14 +89,14 @@ class Matrix {
                 for(char k = 0; k < 3; k++)
                     res[i][j] += mat[i][k] * obj.mat[k][j];
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
     // Operator overload delibrately doesn't support division by matrix.
     // Use "A * ~B"
     // Or "A * B.inverse()"
-    inline Matrix operator/(const float scalar) const{
-        static Matrix nullMat = Matrix();
+    inline Matrix3 operator/(const float scalar) const{
+        static Matrix3 nullMat = Matrix3();
         
         if(scalar != 0.0f)
             return operator*(1.0f / scalar);
@@ -104,13 +104,13 @@ class Matrix {
             return nullMat;
     }
 
-    Matrix& operator=(const Matrix& obj) {
+    Matrix3& operator=(const Matrix3& obj) {
         mat = obj.mat;
 
         return *this;
     }
 
-    Matrix& operator=(const float obj[3][3]) {
+    Matrix3& operator=(const float obj[3][3]) {
         for(char i = 0; i < 3; i++) {
             vector<float> row(3);
             copy(begin(obj[i]), end(obj[i]), row.begin());
@@ -120,7 +120,7 @@ class Matrix {
         return *this;
     }
 
-    Matrix& operator+=(const Matrix& obj) {
+    Matrix3& operator+=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat[i][j] += obj.mat[i][j];
@@ -128,7 +128,7 @@ class Matrix {
         return *this;
     }
 
-    Matrix& operator-=(const Matrix& obj) {
+    Matrix3& operator-=(const Matrix3& obj) {
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat[i][j] -= obj.mat[i][j];
@@ -136,7 +136,7 @@ class Matrix {
         return *this;
     }
 
-    Matrix& operator*=(const float scalar) {
+    Matrix3& operator*=(const float scalar) {
        for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 mat[i][j] *= scalar;
@@ -144,7 +144,7 @@ class Matrix {
         return *this;
     }
 
-    Matrix& operator*=(const Matrix& obj) {
+    Matrix3& operator*=(const Matrix3& obj) {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++) {
@@ -161,14 +161,14 @@ class Matrix {
     // Operator overload delibrately doesn't support division by matrix.
     // Use "A *= ~B"
     // Or "A *= B.inverse()"
-    inline Matrix& operator/=(const float scalar) {
+    inline Matrix3& operator/=(const float scalar) {
         if(scalar != 0.0f)
             operator*=( 1.0f / scalar);
 
         return *this;
     }
 
-    bool operator==(const Matrix& obj) const {
+    bool operator==(const Matrix3& obj) const {
         return (
             mat[0] == obj.mat[0] &&
             mat[1] == obj.mat[1] &&
@@ -176,25 +176,25 @@ class Matrix {
         );
     }
 
-    inline bool operator!=(const Matrix& obj) const {
+    inline bool operator!=(const Matrix3& obj) const {
         return !operator==(obj);
     }
 
     // Inverse operator shorthand
-    inline Matrix operator~() {
+    inline Matrix3 operator~() {
         return inverse();
     }
 
     // Special functions
     // These are unique to the class
-    Matrix trans() const {
+    Matrix3 trans() const {
         float res[3][3] = {};
 
         for(char i = 0; i < 3; i++)
             for(char j = 0; j < 3; j++)
                 res[i][j] = mat[j][i];
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
     float trace() const {
@@ -220,7 +220,7 @@ class Matrix {
         return det;
     }
 
-    Matrix adjoint() const {
+    Matrix3 adjoint() const {
         float res[3][3] = {}, cof[2][2] = {};
         int iCof, jCof;
 
@@ -244,13 +244,13 @@ class Matrix {
                 res[i][j] = cof[0][0] * cof[1][1] - cof[0][1] * cof[1][0];
             }
 
-        return Matrix(res);
+        return Matrix3(res);
     }
 
-    Matrix inverse() const {
-        static Matrix nullMat = Matrix();
+    Matrix3 inverse() const {
+        static Matrix3 nullMat = Matrix3();
 
-        Matrix invMat = adjoint();
+        Matrix3 invMat = adjoint();
         float determinant = det();
 
         if (determinant != 0.0f) {
@@ -279,7 +279,7 @@ class Matrix {
     // "a b c\n"
     // "x y z\n"
     // "p q r\n"
-    friend ostream& operator<< (ostream& os, const Matrix& obj) {
+    friend ostream& operator<< (ostream& os, const Matrix3& obj) {
         for(const vector<float>& row: obj.mat) {
             for(const float ele: row)
                 os << ele << ' ';
@@ -291,7 +291,7 @@ class Matrix {
 };
 
 // Additional overload to reflect commutative property of scalar multiplication
-inline Matrix operator*(const float scalar, const Matrix obj) {
+inline Matrix3 operator*(const float scalar, const Matrix3 obj) {
     return obj * scalar;
 }
 
