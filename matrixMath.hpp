@@ -6,10 +6,12 @@
 
 using namespace std;
 
+static Matrix failMatrix = Matrix(0, 0);
+
 class Matrix {
     private:
     vector<vector<float>> _mat;
-    uint16_t _m, _n;
+    uint16_t _rows, _cols;
 
     public:
     // Default contructor
@@ -44,16 +46,19 @@ class Matrix {
 
     // Deconstruct matrix into a flat array
     void toArray(float* res) const {
-        for(uint16_t i = 0; i < 3; i++)
-            copy(_mat[i].begin(), _mat[i].end(), res + i * _n);
+        for(uint16_t i = 0; i < _rows; i++)
+            copy(_mat[i].begin(), _mat[i].end(), res + i * _cols);
     }
 
     // Operator overloading
     Matrix operator+(const Matrix& obj) const {
-        vector<vector<float>> res = vector<vector<float>>(obj.M(), vector<float>(obj.N()));
+        if(rows() != obj.rows() || cols() != obj.cols())
+            return failMatrix;
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
+
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 res[i][j] = _mat[i][j] + obj._mat[i][j];
 
         return Matrix(res);
@@ -65,20 +70,23 @@ class Matrix {
     }
 
     Matrix operator-(const Matrix& obj) const {
-        vector<vector<float>> res = vector<vector<float>>(obj.M(), vector<float>(obj.N()));
+        if(rows() != obj.rows() || cols() != obj.cols())
+            return failMatrix;
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
+
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 res[i][j] = _mat[i][j] - obj._mat[i][j];
 
         return Matrix(res);
     }
 
     Matrix operator-() const {
-        vector<vector<float>> res = vector<vector<float>>(M(), vector<float>(N()));
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 res[i][j] = -_mat[i][j];
 
         return Matrix(res);
@@ -86,21 +94,24 @@ class Matrix {
     }
 
     Matrix operator*(const float scalar) const {
-        vector<vector<float>> res = vector<vector<float>>(M(), vector<float>(N()));
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 res[i][j] = _mat[i][j] * scalar;
 
         return Matrix(res);
     }
 
     Matrix operator*(const Matrix& obj) const {
-        vector<vector<float>> res = vector<vector<float>>(obj.M(), vector<float>(obj.N()));
+        if(cols() != obj.rows())
+            return failMatrix;
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
-                for(uint16_t k = 0; k < 3; k++)
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(obj.cols(), 0.0f));
+
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < obj._cols; j++)
+                for(uint16_t k = 0; k < _cols; k++)
                     res[i][j] += _mat[i][k] * obj._mat[k][j];
 
         return Matrix(res);
@@ -110,60 +121,59 @@ class Matrix {
     // Use "A * ~B"
     // Or "A * B.inverse()"
     inline Matrix operator/(const float scalar) const{
-        static Matrix nullMat = Matrix(M(), N());
-        
         if(scalar != 0.0f)
             return operator*(1.0f / scalar);
         else
-            return nullMat;
+            return failMatrix;
     }
 
     Matrix& operator=(const Matrix& obj) {
         _mat = obj._mat;
-
-        return *this;
-    }
-
-    Matrix& operator=(const float obj[3][3]) {
-        for(uint16_t i = 0; i < 3; i++) {
-            vector<float> row(3);
-            copy(begin(obj[i]), end(obj[i]), row.begin());
-            _mat.push_back(row);
-        }
+        _rows = obj._rows;
+        _cols = obj._cols;
 
         return *this;
     }
 
     Matrix& operator+=(const Matrix& obj) {
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        if(rows() != obj.rows() || cols() != obj.cols())
+            return failMatrix;
+
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 _mat[i][j] += obj._mat[i][j];
 
         return *this;
     }
 
     Matrix& operator-=(const Matrix& obj) {
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        if(rows() != obj.rows() || cols() != obj.cols())
+            return failMatrix;
+
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 _mat[i][j] -= obj._mat[i][j];
 
         return *this;
     }
 
     Matrix& operator*=(const float scalar) {
-       for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
                 _mat[i][j] *= scalar;
 
         return *this;
     }
 
     Matrix& operator*=(const Matrix& obj) {
-        vector<vector<float>> res = vector<vector<float>>(obj.M(), vector<float>(obj.N()));
+        if(cols() != obj.rows())
+            return failMatrix;
 
-        for(uint16_t i = 0; i < 3; i++) {
-            for(uint16_t j = 0; j < 3; j++)
-                for(uint16_t k = 0; k < 3; k++)
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(obj.cols()));
+
+        for(uint16_t i = 0; i < _rows; i++) {
+            for(uint16_t j = 0; j < obj._cols; j++)
+                for(uint16_t k = 0; k < _cols; k++)
                     res[i][j] += _mat[i][k] * obj._mat[k][j];
 
             copy(begin(res[i]), end(res[i]), _mat[i].begin());
@@ -183,11 +193,14 @@ class Matrix {
     }
 
     bool operator==(const Matrix& obj) const {
-        return (
-            _mat[0] == obj._mat[0] &&
-            _mat[1] == obj._mat[1] &&
-            _mat[2] == obj._mat[2]
-        );
+        if(rows() != obj.rows() || cols() != obj.cols())
+            return false;
+        else
+            for(uint16_t i = 0; i < rows(); i++)
+                if(_mat[i] != obj._mat[i])
+                    return false;
+
+        return true;
     }
 
     inline bool operator!=(const Matrix& obj) const {
@@ -195,14 +208,14 @@ class Matrix {
     }
 
     // Inverse operator shorthand
-    inline Matrix operator~() {
+    /*inline Matrix operator~() {
         return inverse();
-    }
+    }*/
 
     // Special functions
     // These are unique to the class
     inline bool isSquare() const {
-        return _m == _n;
+        return _rows == _cols;
     }
 
     float trace() const {
@@ -215,31 +228,55 @@ class Matrix {
     }
 
     float det() const {
+        if(!isSquare())
+            return 0.0f;
+
         float det = 0.0f;
+        Matrix tempMat = Matrix(*this);
 
-        // Positive multiplication terms
-        for(uint16_t i = 0; i < 3; i++)
-            det += _mat[i % 3][0] * _mat[(i + 1) % 3][1] * _mat[(i + 2) % 3][2];
+        for (uint16_t i = 0; i < _rows; i++) {
+            int pivot = i;
+            for (uint16_t j = i + 1; j < _rows; j++) {
+                if (abs(tempMat(j, i)) > abs(tempMat(pivot, i))) {
+                    pivot = j;
+                }
+            }
 
-        // Negative multiplication terms
-        for(uint16_t i = 0; i < 3; i++)
-            det -= _mat[i % 3][2] * _mat[(i + 1) % 3][1] * _mat[(i + 2) % 3][0];
+            if (pivot != i) {
+                vector<float> temp = tempMat._mat[i];
+                tempMat._mat[i] = tempMat._mat[pivot];
+                tempMat._mat[pivot] = temp;
+
+                det *= -1.0f;
+            }
+
+            if (tempMat(i, i) == 0.0f)
+                return 0.0f;
+
+            det *= tempMat(i, i);
+            for (uint16_t j = i + 1; j < _rows; j++) {
+                double factor = tempMat(j, i) / tempMat(i, i);
+                for (int k = i + 1; k < _rows; k++) {
+                    tempMat(j, k) -= factor * tempMat(i, k);
+                }
+            }
+        }
 
         return det;
     }
 
     Matrix trans() const {
-        vector<vector<float>> res = vector<vector<float>>(M(), vector<float>(N()));
+        vector<vector<float>> res = vector<vector<float>>(cols(), vector<float>(rows()));
 
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++)
-                res[i][j] = _mat[j][i];
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++)
+                res[j][i] = _mat[i][j];
 
         return Matrix(res);
     }
 
-    Matrix adjoint() const {
-        vector<vector<float>> res = vector<vector<float>>(M(), vector<float>(N()));
+    /*Matrix adjoint() const {
+        vector<vector<float>> res = vector<vector<float>>(rows(), vector<float>(cols()));
         float cof[2][2] = {};
         int iCof, jCof;
 
@@ -267,7 +304,7 @@ class Matrix {
     }
 
     Matrix inverse() const {
-        static Matrix nullMat = Matrix(M(), N());
+        static Matrix nullMat = Matrix(rows(), cols());
 
         Matrix invMat = adjoint();
         float determinant = det();
@@ -283,25 +320,33 @@ class Matrix {
         }
         else
             return nullMat;
-    }
+    }*/
 
     // Getters & setters
+    inline uint16_t rows() const {
+        return _rows;
+    }
+
+    inline uint16_t cols() const {
+        return _cols;
+    }
+
     float& operator()(int i, int j) {
-        return _mat[i % 3][j % 3];
+        return _mat[i % rows()][j % cols()];
     }
 
     float operator()(int i, int j) const {
-        return _mat[i % 3][j % 3];
+        return _mat[i % rows()][j % cols()];
     }
 
-    inline uint16_t M() const {
-        return _m;
+    vector<float>& operator()(int i) {
+        return _mat[i % rows()];
     }
 
-    inline uint16_t N() const {
-        return _n;
+    vector<float> operator()(int i) const {
+        return _mat[i % rows()];
     }
-
+    
     // toString()
     // "a b c\n"
     // "x y z\n"
