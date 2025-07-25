@@ -279,6 +279,29 @@ class Matrix {
         return Matrix(res);
     }
 
+    Matrix adjoint() const {
+        if(!isSquare())
+            return failMatrix;
+
+        Matrix adjMat = Matrix(_cols, _rows);
+
+        uint8_t sign = 1;
+        for(uint16_t i = 0; i < _rows; i++)
+            for(uint16_t j = 0; j < _cols; j++) {
+                for(uint16_t p = 0; p < _rows; p++) {
+                    if(p == i)
+                        continue;
+
+                    for(uint16_t q = 0; q < _cols; q++) {
+                        if(q == j)
+                            continue;
+
+                        
+                    }
+                }
+            }
+    }
+
     /*Matrix adjoint() const {
         vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
         float cof[2][2] = {};
