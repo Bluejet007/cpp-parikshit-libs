@@ -260,6 +260,7 @@ class Matrix {
             det *= tempMat(i, i);
             for (uint16_t j = i + 1; j < _rows; j++) {
                 double factor = tempMat(j, i) / tempMat(i, i);
+
                 for (int k = i + 1; k < _rows; k++) {
                     tempMat(j, k) -= factor * tempMat(i, k);
                 }
@@ -283,54 +284,44 @@ class Matrix {
         if(!isSquare())
             return failMatrix;
 
-        Matrix adjMat = Matrix(_cols, _rows);
+        Matrix adjMat = Matrix(_cols, _rows, 1);
+        Matrix tempMat = Matrix(*this);
 
-        uint8_t sign = 1;
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++) {
-                for(uint16_t p = 0; p < _rows; p++) {
-                    if(p == i)
-                        continue;
-
-                    for(uint16_t q = 0; q < _cols; q++) {
-                        if(q == j)
-                            continue;
-
-                        
-                    }
+        for (uint16_t i = 0; i < _rows; i++) {
+            int pivot = i;
+            for (uint16_t j = i + 1; j < _rows; j++) {
+                if (abs(tempMat(j, i)) > abs(tempMat(pivot, i))) {
+                    pivot = j;
                 }
             }
-    }
 
-    /*Matrix adjoint() const {
-        vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
-        float cof[2][2] = {};
-        int iCof, jCof;
-
-        for(uint16_t i = 0; i < 3; i++)
-            for(uint16_t j = 0; j < 3; j++) {
-                iCof = jCof = 0;
-
-                //Cofactor matrix
-                for(uint16_t row = 0; row < 3; row++)
-                    for(uint16_t col = 0; col < 3; col++)
-                        if(row != i && col != j) {
-                            cof[iCof][jCof++] = _mat[row][col];
-                            
-                            if(jCof == 2) {
-                                jCof = 0;
-                                iCof++;
-                            }
-                        }
-
-                //Determinant
-                res[i][j] = cof[0][0] * cof[1][1] - cof[0][1] * cof[1][0];
+            if (pivot != i) {
+                vector<float> temp = tempMat._mat[i];
+                tempMat._mat[i] = tempMat._mat[pivot];
+                tempMat._mat[pivot] = temp;
+                
+                temp = adjMat._mat[i];
+                adjMat._mat[i] = adjMat._mat[pivot];
+                adjMat._mat[pivot] = temp;
             }
 
-        return Matrix(res);
+            if (tempMat(i, i) == 0.0f)
+                return failMatrix;
+
+            for (uint16_t j = i + 1; j < _rows; j++) {
+                double factor = tempMat(j, i) / tempMat(i, i);
+
+                for (int k = i + 1; k < _rows; k++) {
+                    tempMat(j, k) -= factor * tempMat(i, k);
+                    adjMat(j, k) -= factor * adjMat(i, k);
+                }
+            }
+        }
+
+        return adjMat;
     }
 
-    Matrix inverse() const {
+    /*Matrix inverse() const {
         static Matrix nullMat = Matrix(_rows, _cols);
 
         Matrix invMat = adjoint();
