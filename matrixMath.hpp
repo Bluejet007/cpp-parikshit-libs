@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <vector>
+#include <initializer_list>
+#include <cstdint>
 
 using namespace std;
-
-static Matrix failMatrix = Matrix(0, 0);
 
 class Matrix {
     private:
@@ -14,30 +14,49 @@ class Matrix {
     uint16_t _rows, _cols;
 
     public:
-    // Construct with dimensions
-    Matrix(const uint16_t m, const uint16_t n): _mat(m, vector<float>(n, 0.0f)), _rows(m) , _cols(n) {}
+    // Construct matrix with given shape.
+    Matrix(const uint16_t m, const uint16_t n): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {}
 
-    // Construct with values from a flat array
+    // Inline static initialisation. The shape must be passed with the array.
+    Matrix(const initializer_list<initializer_list<float>> matrix): _mat(matrix.size()), _rows(matrix.size()) {
+        _cols = matrix.size() != 0 ? matrix.begin() ->size() : 0;
+
+        for(uint16_t i = 0; i < _rows; i++) {
+            vector<float> vec = vector<float>(_cols);
+
+            auto row = *(matrix.begin() + i);
+
+            copy(row.begin(), row.end(), vec.begin());
+            _mat[i] = vec;
+        }
+    }
+
+    // Construct with values from a flat array. The shape must be passed with the array.
     Matrix(const uint16_t m, const uint16_t n, float* matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
         for(uint16_t i = 0; i < m; i++) {
             float* ptr = matrix + i * n;
 
-            copy(ptr, ptr + n, _mat[i]);
+            copy(ptr, ptr + n, _mat[i].begin());
         }
     }
 
-    // Construct with values from a dynamically allocated array
-    Matrix(const uint16_t m, const uint16_t n, const float** matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
+    // Construct with values from a dynamically allocated array. The shape must be passed with the array.
+    Matrix(const uint16_t m, const uint16_t n, float** matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
         for(uint16_t i = 0; i < m; i++)
             copy(matrix[i], matrix[i] + n, _mat[i].begin());
     }
 
-    // Construct with values from a vector grid
-    Matrix(vector<vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
+    // Wrap a vector of vectors as a matrix.
+    // Matrix(vector<vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
+    //     _cols = matrix.size() > 0 ? matrix[0].size() : 0;
+    // }
+
+    // Construct with values from a vector of vectors.
+    Matrix(const vector<vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
         _cols = matrix.size() > 0 ? matrix[0].size() : 0;
     }
 
-    // Scalar matrix
+    // Contruct a scalar matrix. The shape must be passed with the value, which can be non-square.
     Matrix(const uint16_t m, const uint16_t n, const float scalar): _mat(m, vector<float>(n, 0.0f)), _rows(m) , _cols(n) {
         uint16_t lim = min(n, m);
         
@@ -45,16 +64,24 @@ class Matrix {
             _mat[i][i] = scalar;
     }
 
-    // Deconstruct matrix into a flat array
-    void toArray(float* res) const {
+    // Deconstruct matrix into a flat array.
+    void toArray(float*& res) {
         for(uint16_t i = 0; i < _rows; i++)
             copy(_mat[i].begin(), _mat[i].end(), res + i * _cols);
     }
 
+    // Deconstruct matrix into a dynamically allocated array.
+    void toArray(float**& res) const {
+        for(uint16_t i = 0; i < _rows; i++) {
+            copy(_mat[i].begin(), _mat[i].end(), res[i]);
+        }
+    }
+
     // Operator overloading
+
     Matrix operator+(const Matrix& obj) const {
-        if(_rows != obj.rows() || _cols != obj.cols())
-            return failMatrix;
+        if(_rows != obj._rows || _cols != obj._cols)
+            return Matrix(0, 0);
 
         vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
 
@@ -65,14 +92,14 @@ class Matrix {
         return Matrix(res);
     }
 
+    // Shorthand to create a copy.
     Matrix operator+() const {
         return Matrix(*this);
-        // Unary plus forces pass-by-ref to be pass-by-value
     }
 
     Matrix operator-(const Matrix& obj) const {
-        if(_rows != obj.rows() || _cols != obj.cols())
-            return failMatrix;
+        if(_rows != obj._rows || _cols != obj._cols)
+            return Matrix(0, 0);
 
         vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
 
@@ -83,6 +110,7 @@ class Matrix {
         return Matrix(res);
     }
 
+    // Shorthand to create a negated copy.
     Matrix operator-() const {
         vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
 
@@ -91,11 +119,10 @@ class Matrix {
                 res[i][j] = -_mat[i][j];
 
         return Matrix(res);
-        // Unary minus forces pass-by-ref to be pass-by-value
     }
 
     friend Matrix operator*(const Matrix obj, const float scalar) {
-        vector<vector<float>> res = vector<vector<float>>(obj.rows(), vector<float>(obj.cols()));
+        vector<vector<float>> res = vector<vector<float>>(obj._rows, vector<float>(obj._cols));
 
         for(uint16_t i = 0; i < obj._rows; i++)
             for(uint16_t j = 0; j < obj._cols; j++)
@@ -105,10 +132,10 @@ class Matrix {
     }
 
     Matrix operator*(const Matrix& obj) const {
-        if(_cols != obj.rows())
-            return failMatrix;
+        if(_cols != obj._rows)
+            return Matrix(0, 0);
 
-        vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(obj.cols(), 0.0f));
+        vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(obj._cols, 0.0f));
 
         for(uint16_t i = 0; i < _rows; i++)
             for(uint16_t j = 0; j < obj._cols; j++)
@@ -119,13 +146,12 @@ class Matrix {
     }
 
     // Operator overload delibrately doesn't support division by matrix.
-    // Use "A * ~B"
-    // Or "A * B.inverse()"
+    // Use "A * B.inverse()"
     inline Matrix operator/(const float scalar) {
         if(scalar != 0.0f)
             return *this * (1.0f / scalar);
         else
-            return failMatrix;
+            return Matrix(0, 0);
     }
 
     Matrix& operator=(const Matrix& obj) {
@@ -140,23 +166,19 @@ class Matrix {
     }
 
     Matrix& operator+=(const Matrix& obj) {
-        if(_rows != obj.rows() || _cols != obj.cols())
-            return failMatrix;
-
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++)
-                _mat[i][j] += obj._mat[i][j];
+        if(_rows == obj._rows || _cols == obj._cols)
+            for(uint16_t i = 0; i < _rows; i++)
+                for(uint16_t j = 0; j < _cols; j++)
+                    _mat[i][j] += obj._mat[i][j];
 
         return *this;
     }
 
     Matrix& operator-=(const Matrix& obj) {
-        if(_rows != obj.rows() || _cols != obj.cols())
-            return failMatrix;
-
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++)
-                _mat[i][j] -= obj._mat[i][j];
+        if(_rows == obj._rows || _cols == obj._cols)
+            for(uint16_t i = 0; i < _rows; i++)
+                for(uint16_t j = 0; j < _cols; j++)
+                    _mat[i][j] -= obj._mat[i][j];
 
         return *this;
     }
@@ -170,18 +192,23 @@ class Matrix {
     }
 
     Matrix& operator*=(const Matrix& obj) {
-        if(_cols != obj.rows())
-            return failMatrix;
+        if(_cols == obj._rows) {
+            vector<float> resRow = vector<float>(obj._cols);
 
-        vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(obj.cols()));
+            for(uint16_t i = 0; i < _rows; i++) {
+                fill(resRow.begin(), resRow.end(), 0.0f);
 
-        for(uint16_t i = 0; i < _rows; i++) {
-            for(uint16_t j = 0; j < obj._cols; j++)
-                for(uint16_t k = 0; k < _cols; k++)
-                    res[i][j] += _mat[i][k] * obj._mat[k][j];
+                for(uint16_t j = 0; j < obj._cols; j++)
+                    for(uint16_t k = 0; k < _cols; k++)
+                        resRow[j] += _mat[i][k] * obj._mat[k][j];
 
-            copy(begin(res[i]), end(res[i]), _mat[i].begin());
+                _mat[i].resize(obj._cols);
+                copy(resRow.begin(), resRow.end(), _mat[i].begin());
+            }
+
         }
+
+        _cols = obj._cols;
 
         return *this;
     }
@@ -197,14 +224,10 @@ class Matrix {
     }
 
     bool operator==(const Matrix& obj) const {
-        if(_rows != obj.rows() || _cols != obj.cols())
+        if(_rows != obj._rows || _cols != obj._cols)
             return false;
         else
-            for(uint16_t i = 0; i < _rows; i++)
-                if(_mat[i] != obj._mat[i])
-                    return false;
-
-        return true;
+            return _mat == obj._mat;
     }
 
     inline bool operator!=(const Matrix& obj) const {
@@ -235,18 +258,18 @@ class Matrix {
         if(!isSquare())
             return 0.0f;
 
-        float det = 0.0f;
+        float det = 1.0f;
         Matrix tempMat = Matrix(*this);
 
-        for (uint16_t i = 0; i < _rows; i++) {
+        for(uint16_t i = 0; i < _rows; i++) {
             int pivot = i;
-            for (uint16_t j = i + 1; j < _rows; j++) {
-                if (abs(tempMat(j, i)) > abs(tempMat(pivot, i))) {
+            for(uint16_t j = i + 1; j < _rows; j++) {
+                if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
                     pivot = j;
                 }
             }
 
-            if (pivot != i) {
+            if(pivot != i) {
                 vector<float> temp = tempMat._mat[i];
                 tempMat._mat[i] = tempMat._mat[pivot];
                 tempMat._mat[pivot] = temp;
@@ -254,15 +277,15 @@ class Matrix {
                 det *= -1.0f;
             }
 
-            if (tempMat(i, i) == 0.0f)
+            if(tempMat._mat[i][i] == 0.0f)
                 return 0.0f;
 
-            det *= tempMat(i, i);
-            for (uint16_t j = i + 1; j < _rows; j++) {
-                double factor = tempMat(j, i) / tempMat(i, i);
+            det *= tempMat._mat[i][i];
+            for(uint16_t j = i + 1; j < _rows; j++) {
+                double factor = tempMat._mat[j][i] / tempMat._mat[i][i];
 
                 for (int k = i + 1; k < _rows; k++) {
-                    tempMat(j, k) -= factor * tempMat(i, k);
+                    tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
                 }
             }
         }
@@ -280,40 +303,45 @@ class Matrix {
         return Matrix(res);
     }
 
-    Matrix adjoint() const {
+    Matrix inverse() const {
         if(!isSquare())
-            return failMatrix;
+            return Matrix(0, 0);
 
-        Matrix adjMat = Matrix(_cols, _rows, 1);
+        Matrix adjMat = Matrix(_rows, _cols, 1);
         Matrix tempMat = Matrix(*this);
 
-        for (uint16_t i = 0; i < _rows; i++) {
+        for(uint16_t i = 0; i < _rows; i++) {
             int pivot = i;
-            for (uint16_t j = i + 1; j < _rows; j++) {
-                if (abs(tempMat(j, i)) > abs(tempMat(pivot, i))) {
+            for(uint16_t j = i + 1; j < _rows; j++) {
+                if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
                     pivot = j;
                 }
             }
 
-            if (pivot != i) {
-                vector<float> temp = tempMat._mat[i];
-                tempMat._mat[i] = tempMat._mat[pivot];
-                tempMat._mat[pivot] = temp;
-                
-                temp = adjMat._mat[i];
-                adjMat._mat[i] = adjMat._mat[pivot];
-                adjMat._mat[pivot] = temp;
+            if(pivot != i) {
+                swap(tempMat._mat[i], tempMat._mat[pivot]);
+                swap(adjMat._mat[i], adjMat._mat[pivot]);
             }
 
-            if (tempMat(i, i) == 0.0f)
-                return failMatrix;
+            if(tempMat._mat[i][i] == 0.0f)
+                return Matrix(0, 0);
 
-            for (uint16_t j = i + 1; j < _rows; j++) {
-                double factor = tempMat(j, i) / tempMat(i, i);
 
-                for (int k = i + 1; k < _rows; k++) {
-                    tempMat(j, k) -= factor * tempMat(i, k);
-                    adjMat(j, k) -= factor * adjMat(i, k);
+            float factor = tempMat._mat[i][i];
+            for(uint16_t k = 0; k < _cols; k++) {
+                    if(k >= i) tempMat._mat[i][k] /= factor;
+                    adjMat._mat[i][k] /= factor;
+            }
+
+            for(uint16_t j = 0; j < _rows; j++) {
+                if(j == i)
+                    continue;
+
+                factor = tempMat._mat[j][i];
+
+                for (uint16_t k = 0; k < _cols; k++) {
+                    if(k >= i) tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
+                    adjMat._mat[j][k] -= factor * adjMat._mat[i][k];
                 }
             }
         }
@@ -321,24 +349,11 @@ class Matrix {
         return adjMat;
     }
 
-    /*Matrix inverse() const {
-        static Matrix nullMat = Matrix(_rows, _cols);
-
-        Matrix invMat = adjoint();
+    Matrix adj() const {
         float determinant = det();
 
-        if (determinant != 0.0f) {
-            for(uint16_t i = 0; i < 3; i++) {
-                invMat._mat[i][0] /= determinant;
-                invMat._mat[i][1] /= determinant;
-                invMat._mat[i][2] /= determinant;
-            }
-
-            return invMat;
-        }
-        else
-            return nullMat;
-    }*/
+        return inverse() * determinant;
+    }
 
     // Getters & setters
     inline uint16_t rows() const {
