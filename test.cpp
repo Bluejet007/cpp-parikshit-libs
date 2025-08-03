@@ -1,4 +1,4 @@
-#include <iostream>
+#define _USE_MATRIX_PRINT
 #include "matrixMath.hpp"
 
 using namespace std;

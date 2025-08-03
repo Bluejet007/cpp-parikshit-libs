@@ -1,31 +1,36 @@
 #ifndef MATRIX_MATH_H
 #define MATRIX_MATH_H
 
+#ifdef _USE_MATRIX_PRINT
 #include <iostream>
+#endif
+
 #include <vector>
 #include <initializer_list>
 #include <cstdint>
 
-using namespace std;
+ // Defines:
+ // _USE_MATRIX_PRINT       - Imports <iostream> and enables the print function.
+ // _USE_MATRIX_SHORTHANDS  - Enables the shorthand operators "~A" for quick inverse and "+A" for quick copy.
 
 class Matrix {
     private:
-    vector<vector<float>> _mat;
-    uint16_t _rows, _cols;
+    std::vector<std::vector<float>> _mat;
+    std::uint16_t _rows, _cols;
 
     public:
     /* Constructors */
-    Matrix(const uint16_t m, const uint16_t n);
-    Matrix(const initializer_list<initializer_list<float>> matrix);
-    Matrix(const uint16_t m, const uint16_t n, float* matrix);
-    Matrix(const uint16_t m, const uint16_t n, float** matrix);
-    Matrix(const vector<vector<float>>& matrix);
-    Matrix(const uint16_t m, const uint16_t n, const float scalar);
+    Matrix(const std::uint16_t m, const std::uint16_t n);
+    Matrix(const std::initializer_list<std::initializer_list<float>> matrix);
+    Matrix(const std::uint16_t m, const std::uint16_t n, float* matrix);
+    Matrix(const std::uint16_t m, const std::uint16_t n, float** matrix);
+    Matrix(const std::vector<std::vector<float>>& matrix);
+    Matrix(const std::uint16_t m, const std::uint16_t n, const float scalar);
 
     /* Deconstructors */
     void toArray(float*& res) const;
     void toArray(float**& res) const;
-    vector<vector<float>> toVectors() const;
+    std::vector<std::vector<float>> toVectors() const;
 
     /* Arithmetic perators */
     Matrix operator+(const Matrix& obj) const;
@@ -56,15 +61,17 @@ class Matrix {
     Matrix adj() const;
 
     /* Getters & setters */
-    inline uint16_t rows() const;
-    inline uint16_t cols() const;
-    float& operator()(uint16_t i, uint16_t j);
-    float operator()(uint16_t i, uint16_t j) const;
-    vector<float>& operator()(uint16_t i);
-    vector<float> operator()(uint16_t i) const;
+    inline std::uint16_t rows() const;
+    inline std::uint16_t cols() const;
+    float& operator()(std::uint16_t i, std::uint16_t j);
+    float operator()(std::uint16_t i, std::uint16_t j) const;
+    std::vector<float>& operator()(std::uint16_t i);
+    std::vector<float> operator()(std::uint16_t i) const;
 
     /* toString() */
-    friend ostream& operator<<(ostream& os, const Matrix& obj);
+    #ifdef _USE_MATRIX_PRINT
+    friend std::ostream& operator<<(std::ostream& os, const Matrix& obj);
+    #endif
 
     /* Additional shorthand operators */
     #ifdef _USE_MATRIX_SHORTHANDS
@@ -75,14 +82,14 @@ class Matrix {
 
 
 // Construct matrix with given shape.
-Matrix::Matrix(const uint16_t m, const uint16_t n): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {}
+Matrix::Matrix(const std::uint16_t m, const std::uint16_t n): _mat(m, std::vector<float>(n)), _rows(m) , _cols(n) {}
 
 // Inline static initialisation. The shape must be passed with the array.
-Matrix::Matrix(const initializer_list<initializer_list<float>> matrix): _mat(matrix.size()), _rows(matrix.size()) {
+Matrix::Matrix(const std::initializer_list<std::initializer_list<float>> matrix): _mat(matrix.size()), _rows(matrix.size()) {
     _cols = matrix.size() != 0 ? matrix.begin() ->size() : 0;
 
-    for(uint16_t i = 0; i < _rows; i++) {
-        vector<float> vec = vector<float>(_cols);
+    for(std::uint16_t i = 0; i < _rows; i++) {
+        std::vector<float> vec = std::vector<float>(_cols);
 
         auto row = *(matrix.begin() + i);
 
@@ -92,8 +99,8 @@ Matrix::Matrix(const initializer_list<initializer_list<float>> matrix): _mat(mat
 }
 
 // Construct with values from a flat array. The shape must be passed with the array.
-Matrix::Matrix(const uint16_t m, const uint16_t n, float* matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
-    for(uint16_t i = 0; i < m; i++) {
+Matrix::Matrix(const std::uint16_t m, const std::uint16_t n, float* matrix): _mat(m, std::vector<float>(n)), _rows(m) , _cols(n) {
+    for(std::uint16_t i = 0; i < m; i++) {
         float* ptr = matrix + i * n;
 
         copy(ptr, ptr + n, _mat[i].begin());
@@ -101,39 +108,39 @@ Matrix::Matrix(const uint16_t m, const uint16_t n, float* matrix): _mat(m, vecto
 }
 
 // Construct with values from a dynamically allocated array. The shape must be passed with the array.
-Matrix::Matrix(const uint16_t m, const uint16_t n, float** matrix): _mat(m, vector<float>(n)), _rows(m) , _cols(n) {
-    for(uint16_t i = 0; i < m; i++)
+Matrix::Matrix(const std::uint16_t m, const std::uint16_t n, float** matrix): _mat(m, std::vector<float>(n)), _rows(m) , _cols(n) {
+    for(std::uint16_t i = 0; i < m; i++)
         copy(matrix[i], matrix[i] + n, _mat[i].begin());
 }
 
 // Construct with values from a vector of vectors.
-Matrix::Matrix(const vector<vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
+Matrix::Matrix(const std::vector<std::vector<float>>& matrix): _mat(matrix), _rows(matrix.size()) {
     _cols = matrix.size() > 0 ? matrix[0].size() : 0;
 }
 
 // Contruct a scalar matrix. The shape must be passed with the value, which can be non-square.
-Matrix::Matrix(const uint16_t m, const uint16_t n, const float scalar): _mat(m, vector<float>(n, 0.0f)), _rows(m) , _cols(n) {
-    uint16_t lim = min(n, m);
+Matrix::Matrix(const std::uint16_t m, const std::uint16_t n, const float scalar): _mat(m, std::vector<float>(n, 0.0f)), _rows(m) , _cols(n) {
+    std::uint16_t lim = std::min(n, m);
     
-    for(uint16_t i = 0; i < lim; i++)
+    for(std::uint16_t i = 0; i < lim; i++)
         _mat[i][i] = scalar;
 }
 
 // Deconstruct matrix into a flat array.
 void Matrix::toArray(float*& res) const {
-    for(uint16_t i = 0; i < _rows; i++)
+    for(std::uint16_t i = 0; i < _rows; i++)
         copy(_mat[i].begin(), _mat[i].end(), res + i * _cols);
 }
 
 // Deconstruct matrix into a dynamically allocated array.
 void Matrix::toArray(float**& res) const {
-    for(uint16_t i = 0; i < _rows; i++) {
+    for(std::uint16_t i = 0; i < _rows; i++) {
         copy(_mat[i].begin(), _mat[i].end(), res[i]);
     }
 }
 
 // Deconstruct matrix into a vector of vectors.
-vector<vector<float>> Matrix::toVectors() const {
+std::vector<std::vector<float>> Matrix::toVectors() const {
     return _mat;
 }
 
@@ -144,10 +151,10 @@ Matrix Matrix::operator+(const Matrix& obj) const {
     if(_rows != obj._rows || _cols != obj._cols)
         return Matrix(0, 0);
 
-    vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(_cols));
 
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < _cols; j++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < _cols; j++)
             res[i][j] = _mat[i][j] + obj._mat[i][j];
 
     return Matrix(res);
@@ -158,10 +165,10 @@ Matrix Matrix::operator-(const Matrix& obj) const {
     if(_rows != obj._rows || _cols != obj._cols)
         return Matrix(0, 0);
 
-    vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(_cols));
 
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < _cols; j++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < _cols; j++)
             res[i][j] = _mat[i][j] - obj._mat[i][j];
 
     return Matrix(res);
@@ -169,10 +176,10 @@ Matrix Matrix::operator-(const Matrix& obj) const {
 
 // Shorthand to create a negated copy.
 Matrix Matrix::operator-() const {
-    vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(_cols));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(_cols));
 
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < _cols; j++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < _cols; j++)
             res[i][j] = -_mat[i][j];
 
     return Matrix(res);
@@ -180,10 +187,10 @@ Matrix Matrix::operator-() const {
 
 // Scalar multiplication. Equivalent to "A * sI".
 Matrix operator*(const Matrix obj, const float scalar) {
-    vector<vector<float>> res = vector<vector<float>>(obj._rows, vector<float>(obj._cols));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(obj._rows, std::vector<float>(obj._cols));
 
-    for(uint16_t i = 0; i < obj._rows; i++)
-        for(uint16_t j = 0; j < obj._cols; j++)
+    for(std::uint16_t i = 0; i < obj._rows; i++)
+        for(std::uint16_t j = 0; j < obj._cols; j++)
             res[i][j] = obj._mat[i][j] * scalar;
 
     return Matrix(res);
@@ -194,11 +201,11 @@ Matrix Matrix::operator*(const Matrix& obj) const {
     if(_cols != obj._rows)
         return Matrix(0, 0);
 
-    vector<vector<float>> res = vector<vector<float>>(_rows, vector<float>(obj._cols, 0.0f));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(obj._cols, 0.0f));
 
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < obj._cols; j++)
-            for(uint16_t k = 0; k < _cols; k++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < obj._cols; j++)
+            for(std::uint16_t k = 0; k < _cols; k++)
                 res[i][j] += _mat[i][k] * obj._mat[k][j];
 
     return Matrix(res);
@@ -227,8 +234,8 @@ Matrix& Matrix::operator=(const Matrix& obj) {
 // In-place addition. Doesn't use extra memory.
 Matrix& Matrix::operator+=(const Matrix& obj) {
     if(_rows == obj._rows || _cols == obj._cols)
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++)
+        for(std::uint16_t i = 0; i < _rows; i++)
+            for(std::uint16_t j = 0; j < _cols; j++)
                 _mat[i][j] += obj._mat[i][j];
 
     return *this;
@@ -237,8 +244,8 @@ Matrix& Matrix::operator+=(const Matrix& obj) {
 // In-place subtraction. Doesn't use extra memory.
 Matrix& Matrix::operator-=(const Matrix& obj) {
     if(_rows == obj._rows || _cols == obj._cols)
-        for(uint16_t i = 0; i < _rows; i++)
-            for(uint16_t j = 0; j < _cols; j++)
+        for(std::uint16_t i = 0; i < _rows; i++)
+            for(std::uint16_t j = 0; j < _cols; j++)
                 _mat[i][j] -= obj._mat[i][j];
 
     return *this;
@@ -246,8 +253,8 @@ Matrix& Matrix::operator-=(const Matrix& obj) {
 
 // In-place scalar multiplication. Equivalent to "A * sI". Doesn't use extra memory.
 Matrix& Matrix::operator*=(const float scalar) {
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < _cols; j++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < _cols; j++)
             _mat[i][j] *= scalar;
 
     return *this;
@@ -256,13 +263,13 @@ Matrix& Matrix::operator*=(const float scalar) {
 // Perform dot product & assign. Uses reduced extra memory.
 Matrix& Matrix::operator*=(const Matrix& obj) {
     if(_cols == obj._rows) {
-        vector<float> resRow = vector<float>(obj._cols);
+        std::vector<float> resRow = std::vector<float>(obj._cols);
 
-        for(uint16_t i = 0; i < _rows; i++) {
+        for(std::uint16_t i = 0; i < _rows; i++) {
             fill(resRow.begin(), resRow.end(), 0.0f);
 
-            for(uint16_t j = 0; j < obj._cols; j++)
-                for(uint16_t k = 0; k < _cols; k++)
+            for(std::uint16_t j = 0; j < obj._cols; j++)
+                for(std::uint16_t k = 0; k < _cols; k++)
                     resRow[j] += _mat[i][k] * obj._mat[k][j];
 
             _mat[i].resize(obj._cols);
@@ -304,10 +311,10 @@ inline bool Matrix::isSquare() const {
 
 // Returns the sum of the pincipal diagonal. The matrix can be non-square.
 float Matrix::trace() const {
-    uint16_t lim = min(_cols, _rows);
+    std::uint16_t lim = std::min(_cols, _rows);
     float trace = 0.0f;
 
-    for(uint16_t i = 0; i < lim; i++)
+    for(std::uint16_t i = 0; i < lim; i++)
         trace += _mat[i][i];
 
     return trace;
@@ -321,16 +328,16 @@ float Matrix::det() const {
     float det = 1.0f;
     Matrix tempMat = Matrix(*this);
 
-    for(uint16_t i = 0; i < _rows; i++) {
+    for(std::uint16_t i = 0; i < _rows; i++) {
         int pivot = i;
-        for(uint16_t j = i + 1; j < _rows; j++) {
+        for(std::uint16_t j = i + 1; j < _rows; j++) {
             if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
                 pivot = j;
             }
         }
 
         if(pivot != i) {
-            vector<float> temp = tempMat._mat[i];
+            std::vector<float> temp = tempMat._mat[i];
             tempMat._mat[i] = tempMat._mat[pivot];
             tempMat._mat[pivot] = temp;
 
@@ -341,7 +348,7 @@ float Matrix::det() const {
             return 0.0f;
 
         det *= tempMat._mat[i][i];
-        for(uint16_t j = i + 1; j < _rows; j++) {
+        for(std::uint16_t j = i + 1; j < _rows; j++) {
             double factor = tempMat._mat[j][i] / tempMat._mat[i][i];
 
             for (int k = i + 1; k < _rows; k++) {
@@ -355,10 +362,10 @@ float Matrix::det() const {
 
 // Create the transpose of the matrix.
 Matrix Matrix::trans() const {
-    vector<vector<float>> res = vector<vector<float>>(_cols, vector<float>(_rows));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_cols, std::vector<float>(_rows));
 
-    for(uint16_t i = 0; i < _rows; i++)
-        for(uint16_t j = 0; j < _cols; j++)
+    for(std::uint16_t i = 0; i < _rows; i++)
+        for(std::uint16_t j = 0; j < _cols; j++)
             res[j][i] = _mat[i][j];
 
     return Matrix(res);
@@ -372,9 +379,9 @@ Matrix Matrix::inverse() const {
     Matrix adjMat = Matrix(_rows, _cols, 1);
     Matrix tempMat = Matrix(*this);
 
-    for(uint16_t i = 0; i < _rows; i++) {
+    for(std::uint16_t i = 0; i < _rows; i++) {
         int pivot = i;
-        for(uint16_t j = i + 1; j < _rows; j++) {
+        for(std::uint16_t j = i + 1; j < _rows; j++) {
             if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
                 pivot = j;
             }
@@ -390,18 +397,18 @@ Matrix Matrix::inverse() const {
 
 
         float factor = tempMat._mat[i][i];
-        for(uint16_t k = 0; k < _cols; k++) {
+        for(std::uint16_t k = 0; k < _cols; k++) {
                 if(k >= i) tempMat._mat[i][k] /= factor;
                 adjMat._mat[i][k] /= factor;
         }
 
-        for(uint16_t j = 0; j < _rows; j++) {
+        for(std::uint16_t j = 0; j < _rows; j++) {
             if(j == i)
                 continue;
 
             factor = tempMat._mat[j][i];
 
-            for (uint16_t k = 0; k < _cols; k++) {
+            for (std::uint16_t k = 0; k < _cols; k++) {
                 if(k >= i) tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
                 adjMat._mat[j][k] -= factor * adjMat._mat[i][k];
             }
@@ -419,59 +426,69 @@ Matrix Matrix::adj() const {
 }
 
 // Returns the number of rows.
-inline uint16_t Matrix::rows() const {
+inline std::uint16_t Matrix::rows() const {
     return _rows;
 }
 
 // Returns the number of columns.
-inline uint16_t Matrix::cols() const {
+inline std::uint16_t Matrix::cols() const {
     return _cols;
 }
 
 // Returns a modifiable reference to the value at (i, j).
-float& Matrix::operator()(uint16_t i, uint16_t j) {
+float& Matrix::operator()(std::uint16_t i, std::uint16_t j) {
     return _mat[i % _rows][j % _cols];
 }
 
 // Returns the value at (i, j).
-float Matrix::operator()(uint16_t i, uint16_t j) const {
+float Matrix::operator()(std::uint16_t i, std::uint16_t j) const {
     return _mat[i % _rows][j % _cols];
 }
 
 // Returns a modifiable reference to the ith row.
-vector<float>& Matrix::operator()(uint16_t i) {
+std::vector<float>& Matrix::operator()(std::uint16_t i) {
     return _mat[i % _rows];
 }
 
 // Returns the ith row.
-vector<float> Matrix::operator()(uint16_t i) const {
+std::vector<float> Matrix::operator()(std::uint16_t i) const {
     return _mat[i % _rows];
 }
 
-// toString()
+#ifdef _USE_MATRIX_PRINT
+// toString(). Enable with "#define _USE_MATRIX_SHORTHANDS"
 // "a b c\n"
 // "d e f\n"
 // "g h i\n"
-ostream& operator<<(ostream& os, const Matrix& obj) {
-    for(const vector<float>& row: obj._mat) {
+std::ostream& operator<<(std::ostream& os, const Matrix& obj) {
+    for(const std::vector<float>& row: obj._mat) {
         for(const float ele: row)
             os << ele << ' ';
-        os << endl;
+        os << std::endl;
     }
 
     return os;
 }
+#endif
 
 #ifdef _USE_MATRIX_SHORTHANDS
-// Shorthand  to invert matrix. Enable with "#def _USE_MATRIX_SHORTHANDS"
+// Shorthand  to invert matrix. Enable with "#define _USE_MATRIX_SHORTHANDS"
 inline Matrix Matrix::operator~() {
     return inverse();
 }
 
-// Shorthand to create a copy. Enable with "#def _USE_MATRIX_SHORTHANDS"
+// Shorthand to create a copy. Enable with "#define _USE_MATRIX_SHORTHANDS"
 Matrix Matrix::operator+() const {
     return Matrix(*this);
 }
+#endif
+
+#ifdef _USE_MATRIX_PRINT
+#undef _USE_MATRIX_PRINT
+#endif
+
+#ifdef _USE_MATRIX_SHORTHANDS
+#undef _USE_MATRIX_SHORTHANDS
 #endif
 
 #endif
