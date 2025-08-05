@@ -2,14 +2,14 @@
 #define MATRIX_MATH_H
 
 #ifdef _USE_MATRIX_PRINT
-#include <iostream>
+    #include <iostream>
 #endif
 
 #include <vector>
 #include <initializer_list>
 #include <cstdint>
 
- // Defines:
+ // Conditional user defines:
  // _USE_MATRIX_PRINT       - Imports <iostream> and enables the print function.
  // _USE_MATRIX_SHORTHANDS  - Enables the shorthand operators "~A" for quick inverse and "+A" for quick copy.
 
@@ -33,24 +33,24 @@ class Matrix {
     std::vector<std::vector<float>> toVectors() const;
 
     /* Arithmetic perators */
-    Matrix operator+(const Matrix& obj) const;
-    Matrix operator-(const Matrix& obj) const;
+    Matrix operator+(const Matrix& otherMatrix) const;
+    Matrix operator-(const Matrix& otherMatrix) const;
     Matrix operator-() const;
-    friend Matrix operator*(const Matrix obj, const float scalar);
-    Matrix operator*(const Matrix& obj) const;
+    friend Matrix operator*(const Matrix otherMatrix, const float scalar);
+    Matrix operator*(const Matrix& otherMatrix) const;
     inline Matrix operator/(const float scalar);
 
     /* Assignment operators */
-    Matrix& operator=(const Matrix& obj);
-    Matrix& operator+=(const Matrix& obj);
-    Matrix& operator-=(const Matrix& obj);
+    Matrix& operator=(const Matrix& otherMatrix);
+    Matrix& operator+=(const Matrix& otherMatrix);
+    Matrix& operator-=(const Matrix& otherMatrix);
     Matrix& operator*=(const float scalar);
-    Matrix& operator*=(const Matrix& obj);
+    Matrix& operator*=(const Matrix& otherMatrix);
     inline Matrix& operator/=(const float scalar);
 
     /* Equality operators */
-    bool operator==(const Matrix& obj) const;
-    inline bool operator!=(const Matrix& obj) const;
+    bool operator==(const Matrix& otherMatrix) const;
+    inline bool operator!=(const Matrix& otherMatrix) const;
 
     /* Matrix operations */
     inline bool isSquare() const;
@@ -70,7 +70,7 @@ class Matrix {
 
     /* toString() */
     #ifdef _USE_MATRIX_PRINT
-    friend std::ostream& operator<<(std::ostream& os, const Matrix& obj);
+    friend std::ostream& operator<<(std::ostream& os, const Matrix& otherMatrix);
     #endif
 
     /* Additional shorthand operators */
@@ -147,29 +147,29 @@ std::vector<std::vector<float>> Matrix::toVectors() const {
 /* Operator overloading */
 
 // Element-wise addition.
-Matrix Matrix::operator+(const Matrix& obj) const {
-    if(_rows != obj._rows || _cols != obj._cols)
+Matrix Matrix::operator+(const Matrix& otherMatrix) const {
+    if(_rows != otherMatrix._rows || _cols != otherMatrix._cols)
         return Matrix(0, 0);
 
     std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(_cols));
 
     for(std::uint16_t i = 0; i < _rows; i++)
         for(std::uint16_t j = 0; j < _cols; j++)
-            res[i][j] = _mat[i][j] + obj._mat[i][j];
+            res[i][j] = _mat[i][j] + otherMatrix._mat[i][j];
 
     return Matrix(res);
 }
 
 // Element-wise subtraction.
-Matrix Matrix::operator-(const Matrix& obj) const {
-    if(_rows != obj._rows || _cols != obj._cols)
+Matrix Matrix::operator-(const Matrix& otherMatrix) const {
+    if(_rows != otherMatrix._rows || _cols != otherMatrix._cols)
         return Matrix(0, 0);
 
     std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(_cols));
 
     for(std::uint16_t i = 0; i < _rows; i++)
         for(std::uint16_t j = 0; j < _cols; j++)
-            res[i][j] = _mat[i][j] - obj._mat[i][j];
+            res[i][j] = _mat[i][j] - otherMatrix._mat[i][j];
 
     return Matrix(res);
 }
@@ -186,27 +186,27 @@ Matrix Matrix::operator-() const {
 }
 
 // Scalar multiplication. Equivalent to "A * sI".
-Matrix operator*(const Matrix obj, const float scalar) {
-    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(obj._rows, std::vector<float>(obj._cols));
+Matrix operator*(const Matrix otherMatrix, const float scalar) {
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(otherMatrix._rows, std::vector<float>(otherMatrix._cols));
 
-    for(std::uint16_t i = 0; i < obj._rows; i++)
-        for(std::uint16_t j = 0; j < obj._cols; j++)
-            res[i][j] = obj._mat[i][j] * scalar;
+    for(std::uint16_t i = 0; i < otherMatrix._rows; i++)
+        for(std::uint16_t j = 0; j < otherMatrix._cols; j++)
+            res[i][j] = otherMatrix._mat[i][j] * scalar;
 
     return Matrix(res);
 }
 
 // Matrix dot product.
-Matrix Matrix::operator*(const Matrix& obj) const {
-    if(_cols != obj._rows)
+Matrix Matrix::operator*(const Matrix& otherMatrix) const {
+    if(_cols != otherMatrix._rows)
         return Matrix(0, 0);
 
-    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(obj._cols, 0.0f));
+    std::vector<std::vector<float>> res = std::vector<std::vector<float>>(_rows, std::vector<float>(otherMatrix._cols, 0.0f));
 
     for(std::uint16_t i = 0; i < _rows; i++)
-        for(std::uint16_t j = 0; j < obj._cols; j++)
+        for(std::uint16_t j = 0; j < otherMatrix._cols; j++)
             for(std::uint16_t k = 0; k < _cols; k++)
-                res[i][j] += _mat[i][k] * obj._mat[k][j];
+                res[i][j] += _mat[i][k] * otherMatrix._mat[k][j];
 
     return Matrix(res);
 }
@@ -220,33 +220,33 @@ inline Matrix Matrix::operator/(const float scalar) {
 }
 
 // Standard assignment.
-Matrix& Matrix::operator=(const Matrix& obj) {
-    if(this == &obj)
+Matrix& Matrix::operator=(const Matrix& otherMatrix) {
+    if(this == &otherMatrix)
         return *this;
 
-    _mat = obj._mat;
-    _rows = obj._rows;
-    _cols = obj._cols;
+    _mat = otherMatrix._mat;
+    _rows = otherMatrix._rows;
+    _cols = otherMatrix._cols;
 
     return *this;
 }
 
 // In-place addition. Doesn't use extra memory.
-Matrix& Matrix::operator+=(const Matrix& obj) {
-    if(_rows == obj._rows || _cols == obj._cols)
+Matrix& Matrix::operator+=(const Matrix& otherMatrix) {
+    if(_rows == otherMatrix._rows || _cols == otherMatrix._cols)
         for(std::uint16_t i = 0; i < _rows; i++)
             for(std::uint16_t j = 0; j < _cols; j++)
-                _mat[i][j] += obj._mat[i][j];
+                _mat[i][j] += otherMatrix._mat[i][j];
 
     return *this;
 }
 
 // In-place subtraction. Doesn't use extra memory.
-Matrix& Matrix::operator-=(const Matrix& obj) {
-    if(_rows == obj._rows || _cols == obj._cols)
+Matrix& Matrix::operator-=(const Matrix& otherMatrix) {
+    if(_rows == otherMatrix._rows || _cols == otherMatrix._cols)
         for(std::uint16_t i = 0; i < _rows; i++)
             for(std::uint16_t j = 0; j < _cols; j++)
-                _mat[i][j] -= obj._mat[i][j];
+                _mat[i][j] -= otherMatrix._mat[i][j];
 
     return *this;
 }
@@ -261,24 +261,24 @@ Matrix& Matrix::operator*=(const float scalar) {
 }
 
 // Perform dot product & assign. Uses reduced extra memory.
-Matrix& Matrix::operator*=(const Matrix& obj) {
-    if(_cols == obj._rows) {
-        std::vector<float> resRow = std::vector<float>(obj._cols);
+Matrix& Matrix::operator*=(const Matrix& otherMatrix) {
+    if(_cols == otherMatrix._rows) {
+        std::vector<float> resRow = std::vector<float>(otherMatrix._cols);
 
         for(std::uint16_t i = 0; i < _rows; i++) {
             fill(resRow.begin(), resRow.end(), 0.0f);
 
-            for(std::uint16_t j = 0; j < obj._cols; j++)
+            for(std::uint16_t j = 0; j < otherMatrix._cols; j++)
                 for(std::uint16_t k = 0; k < _cols; k++)
-                    resRow[j] += _mat[i][k] * obj._mat[k][j];
+                    resRow[j] += _mat[i][k] * otherMatrix._mat[k][j];
 
-            _mat[i].resize(obj._cols);
+            _mat[i].resize(otherMatrix._cols);
             copy(resRow.begin(), resRow.end(), _mat[i].begin());
         }
 
     }
 
-    _cols = obj._cols;
+    _cols = otherMatrix._cols;
 
     return *this;
 }
@@ -292,16 +292,16 @@ inline Matrix& Matrix::operator/=(const float scalar) {
 }
 
 // Check whether dimensions and all elements are equal.
-bool Matrix::operator==(const Matrix& obj) const {
-    if(_rows != obj._rows || _cols != obj._cols)
+bool Matrix::operator==(const Matrix& otherMatrix) const {
+    if(_rows != otherMatrix._rows || _cols != otherMatrix._cols)
         return false;
     else
-        return _mat == obj._mat;
+        return _mat == otherMatrix._mat;
 }
 
 // Check whether any dimension or elements is unequal.
-inline bool Matrix::operator!=(const Matrix& obj) const {
-    return !operator==(obj);
+inline bool Matrix::operator!=(const Matrix& otherMatrix) const {
+    return !operator==(otherMatrix);
 }
 
 // Returns true if the number of rows is equal to the number of columns.
@@ -456,39 +456,39 @@ std::vector<float> Matrix::operator()(std::uint16_t i) const {
 }
 
 #ifdef _USE_MATRIX_PRINT
-// toString(). Enable with "#define _USE_MATRIX_SHORTHANDS"
-// "a b c\n"
-// "d e f\n"
-// "g h i\n"
-std::ostream& operator<<(std::ostream& os, const Matrix& obj) {
-    for(const std::vector<float>& row: obj._mat) {
-        for(const float ele: row)
-            os << ele << ' ';
-        os << std::endl;
-    }
+    // toString(). Enable with "#define _USE_MATRIX_SHORTHANDS"
+    // "a b c\n"
+    // "d e f\n"
+    // "g h i\n"
+    std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
+        for(const std::vector<float>& row: matrix._mat) {
+            for(const float ele: row)
+                os << ele << ' ';
+            os << std::endl;
+        }
 
-    return os;
-}
+        return os;
+    }
 #endif
 
 #ifdef _USE_MATRIX_SHORTHANDS
-// Shorthand  to invert matrix. Enable with "#define _USE_MATRIX_SHORTHANDS"
-inline Matrix Matrix::operator~() {
-    return inverse();
-}
+    // Shorthand  to invert matrix. Enable with "#define _USE_MATRIX_SHORTHANDS"
+    inline Matrix Matrix::operator~() {
+        return inverse();
+    }
 
-// Shorthand to create a copy. Enable with "#define _USE_MATRIX_SHORTHANDS"
-Matrix Matrix::operator+() const {
-    return Matrix(*this);
-}
+    // Shorthand to create a copy. Enable with "#define _USE_MATRIX_SHORTHANDS"
+    Matrix Matrix::operator+() const {
+        return Matrix(*this);
+    }
 #endif
 
 #ifdef _USE_MATRIX_PRINT
-#undef _USE_MATRIX_PRINT
+    #undef _USE_MATRIX_PRINT
 #endif
 
 #ifdef _USE_MATRIX_SHORTHANDS
-#undef _USE_MATRIX_SHORTHANDS
+    #undef _USE_MATRIX_SHORTHANDS
 #endif
 
 #endif
