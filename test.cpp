@@ -3,7 +3,6 @@
 
 using namespace std;
 
-
 int main() {
     Matrix squ = Matrix({{1, 2, 3}, {8, 7, 6}, {4, 5, 9}});
 

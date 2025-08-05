@@ -9,16 +9,16 @@
 #include <initializer_list>
 #include <cstdint>
 
- // Conditional user defines:
- // _USE_MATRIX_PRINT       - Imports <iostream> and enables the print function.
- // _USE_MATRIX_SHORTHANDS  - Enables the shorthand operators "~A" for quick inverse and "+A" for quick copy.
+// Conditional user defines:
+// _USE_MATRIX_PRINT       - Imports <iostream> and enables the print function.
+// _USE_MATRIX_SHORTHANDS  - Enables the shorthand operators "~A" for quick inverse and "+A" for quick copy.
 
 class Matrix {
-    private:
+private:
     std::vector<std::vector<float>> _mat;
     std::uint16_t _rows, _cols;
 
-    public:
+public:
     /* Constructors */
     Matrix(const std::uint16_t m, const std::uint16_t n);
     Matrix(const std::initializer_list<std::initializer_list<float>> matrix);
@@ -121,7 +121,7 @@ Matrix::Matrix(const std::vector<std::vector<float>>& matrix): _mat(matrix), _ro
 // Contruct a scalar matrix. The shape must be passed with the value, which can be non-square.
 Matrix::Matrix(const std::uint16_t m, const std::uint16_t n, const float scalar): _mat(m, std::vector<float>(n, 0.0f)), _rows(m) , _cols(n) {
     std::uint16_t lim = std::min(n, m);
-    
+
     for(std::uint16_t i = 0; i < lim; i++)
         _mat[i][i] = scalar;
 }
@@ -275,7 +275,6 @@ Matrix& Matrix::operator*=(const Matrix& otherMatrix) {
             _mat[i].resize(otherMatrix._cols);
             copy(resRow.begin(), resRow.end(), _mat[i].begin());
         }
-
     }
 
     _cols = otherMatrix._cols;
@@ -351,9 +350,8 @@ float Matrix::det() const {
         for(std::uint16_t j = i + 1; j < _rows; j++) {
             double factor = tempMat._mat[j][i] / tempMat._mat[i][i];
 
-            for (int k = i + 1; k < _rows; k++) {
+            for(int k = i + 1; k < _rows; k++)
                 tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
-            }
         }
     }
 
@@ -382,9 +380,8 @@ Matrix Matrix::inverse() const {
     for(std::uint16_t i = 0; i < _rows; i++) {
         int pivot = i;
         for(std::uint16_t j = i + 1; j < _rows; j++) {
-            if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
+            if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i]))
                 pivot = j;
-            }
         }
 
         if(pivot != i) {
@@ -399,7 +396,7 @@ Matrix Matrix::inverse() const {
         float factor = tempMat._mat[i][i];
         for(std::uint16_t k = 0; k < _cols; k++) {
                 if(k >= i) tempMat._mat[i][k] /= factor;
-                adjMat._mat[i][k] /= factor;
+            adjMat._mat[i][k] /= factor;
         }
 
         for(std::uint16_t j = 0; j < _rows; j++) {
