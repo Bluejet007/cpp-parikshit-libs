@@ -319,7 +319,7 @@ float Matrix::trace() const {
     return trace;
 }
 
-// Returns the determinant of the matrix, which must be square.
+// Returns the determinant of the matrix, which must be square. Uses Gauss elimination method.
 float Matrix::det() const {
     if(!isSquare())
         return 0.0f;
@@ -327,7 +327,8 @@ float Matrix::det() const {
     float det = 1.0f;
     Matrix tempMat = Matrix(*this);
 
-    for(std::uint16_t i = 0; i < _rows; i++) {
+    for(std::uint16_t i = 0; i < _cols; i++) {
+        // Find the pivot (largest) element in the column.
         int pivot = i;
         for(std::uint16_t j = i + 1; j < _rows; j++) {
             if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i])) {
@@ -335,21 +336,26 @@ float Matrix::det() const {
             }
         }
 
+        // Swap cuurent row and pivot row
         if(pivot != i) {
-            std::vector<float> temp = tempMat._mat[i];
-            tempMat._mat[i] = tempMat._mat[pivot];
-            tempMat._mat[pivot] = temp;
+            swap(tempMat._mat[i], tempMat._mat[pivot];
 
             det *= -1.0f;
         }
 
+        // If pivot element is zero, return immediately.
         if(tempMat._mat[i][i] == 0.0f)
             return 0.0f;
 
+        // Multiply pivot element into the determinant.
         det *= tempMat._mat[i][i];
+
+        // Reduce elements below the pivot to zero.
         for(std::uint16_t j = i + 1; j < _rows; j++) {
+            // Get required multiplicative factor to match pivot to the element.
             double factor = tempMat._mat[j][i] / tempMat._mat[i][i];
 
+            // Apply the elementary row operations
             for(int k = i + 1; k < _rows; k++)
                 tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
         }
@@ -369,42 +375,50 @@ Matrix Matrix::trans() const {
     return Matrix(res);
 }
 
-// Returns the inverse of the matrix, which must be square.
+// Returns the inverse of the matrix, which must be square. Uses Gauss-Jordan method.
 Matrix Matrix::inverse() const {
     if(!isSquare())
         return Matrix(0, 0);
 
+    // Create the augmented matrix [A|I]
     Matrix adjMat = Matrix(_rows, _cols, 1);
     Matrix tempMat = Matrix(*this);
 
     for(std::uint16_t i = 0; i < _rows; i++) {
+        // Find the pivot (largest) element in the column.
         int pivot = i;
         for(std::uint16_t j = i + 1; j < _rows; j++) {
             if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i]))
                 pivot = j;
         }
 
+        // Swap current row and pivot row
         if(pivot != i) {
             swap(tempMat._mat[i], tempMat._mat[pivot]);
             swap(adjMat._mat[i], adjMat._mat[pivot]);
         }
 
+        // If pivot element is zero (and thus rank < dimension of the matrix), return fail matrix.
         if(tempMat._mat[i][i] == 0.0f)
             return Matrix(0, 0);
 
 
+        // Reduce the pivot element to one
         float factor = tempMat._mat[i][i];
         for(std::uint16_t k = 0; k < _cols; k++) {
                 if(k >= i) tempMat._mat[i][k] /= factor;
             adjMat._mat[i][k] /= factor;
         }
 
+        // Reduce non-pivot elements in the column to zero.
         for(std::uint16_t j = 0; j < _rows; j++) {
             if(j == i)
                 continue;
 
+            // Get required factor multiplicative factor to match pivot to the element.
             factor = tempMat._mat[j][i];
 
+            // Apply elementary row operations.
             for (std::uint16_t k = 0; k < _cols; k++) {
                 if(k >= i) tempMat._mat[j][k] -= factor * tempMat._mat[i][k];
                 adjMat._mat[j][k] -= factor * adjMat._mat[i][k];
