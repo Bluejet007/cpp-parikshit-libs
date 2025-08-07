@@ -336,10 +336,7 @@ float Matrix::det() const {
         }
 
         if(pivot != i) {
-            std::vector<float> temp = tempMat._mat[i];
-            tempMat._mat[i] = tempMat._mat[pivot];
-            tempMat._mat[pivot] = temp;
-
+            swap(tempMat._mat[i], tempMat._mat[pivot]);
             det *= -1.0f;
         }
 
@@ -380,7 +377,7 @@ Matrix Matrix::inverse() const {
     for(std::uint16_t i = 0; i < _rows; i++) {
         int pivot = i;
         for(std::uint16_t j = i + 1; j < _rows; j++) {
-            if (abs(tempMat._mat[j][i]) > abs(tempMat._mat[pivot][i]))
+            if (abs(tempMat._mat[i][j]) > abs(tempMat._mat[i][j]))
                 pivot = j;
         }
 
