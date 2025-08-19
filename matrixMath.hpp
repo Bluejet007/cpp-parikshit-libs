@@ -1,3 +1,9 @@
+/*
+ * Author's notes for expanding this class in the future:
+ * 1. If very large matrix multiplication is required, non-recursive Strassen multiplication can be implemented.
+ * 2. Numpy-like functions, like max(), argmax(), etc., can be added to library as needed for gradual expansion.
+ */
+
 #ifndef MATRIX_MATH_H
 #define MATRIX_MATH_H
 
@@ -38,7 +44,7 @@ public:
     Matrix operator-() const;
     friend Matrix operator*(const Matrix otherMatrix, const float scalar);
     Matrix operator*(const Matrix& otherMatrix) const;
-    inline Matrix operator/(const float scalar);
+    inline Matrix operator/(const float scalar) const;
 
     /* Assignment operators */
     Matrix& operator=(const Matrix& otherMatrix);
@@ -53,6 +59,7 @@ public:
     inline bool operator!=(const Matrix& otherMatrix) const;
 
     /* Matrix operations */
+    float sum() const;
     inline bool isSquare() const;
     float trace() const;
     float det() const;
@@ -70,13 +77,13 @@ public:
 
     /* toString() */
     #ifdef _USE_MATRIX_PRINT
-    friend std::ostream& operator<<(std::ostream& os, const Matrix& otherMatrix);
+        friend std::ostream& operator<<(std::ostream& os, const Matrix& otherMatrix);
     #endif
 
     /* Additional shorthand operators */
     #ifdef _USE_MATRIX_SHORTHANDS
-    inline Matrix operator~();
-    Matrix operator+() const;
+        inline Matrix operator~();
+        Matrix operator+() const;
     #endif
 };
 
@@ -212,7 +219,7 @@ Matrix Matrix::operator*(const Matrix& otherMatrix) const {
 }
 
 // Scalar division. Equivalent to "A * (1/s)I"
-inline Matrix Matrix::operator/(const float scalar) {
+inline Matrix Matrix::operator/(const float scalar) const {
     if(scalar != 0.0f)
         return *this * (1.0f / scalar);
     else
@@ -303,6 +310,17 @@ inline bool Matrix::operator!=(const Matrix& otherMatrix) const {
     return !operator==(otherMatrix);
 }
 
+// Returns the sum of all elements in the matrix.
+float Matrix::sum() const {
+    float sum = 0.0f;
+
+    for(auto row: _mat)
+        for(auto ele: row)
+            sum += ele;
+
+    return sum;
+}
+
 // Returns true if the number of rows is equal to the number of columns.
 inline bool Matrix::isSquare() const {
     return _rows == _cols;
@@ -336,7 +354,7 @@ float Matrix::det() const {
             }
         }
 
-        // Swap cuurent row and pivot row
+        // Swap current row and pivot row
         if(pivot != i) {
             swap(tempMat._mat[i], tempMat._mat[pivot]);
             det *= -1.0f;
